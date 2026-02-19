@@ -1,0 +1,409 @@
+farm-manager/
+│
+├── backend/                       # Proyecto backend (API, lógica/negocio, seguridad, etc.)
+│   ├── api/                       # Endpoints REST principales (FastAPI, Flask, etc)
+│   │    ├── login.py              # Endpoint de autenticación
+│   │    ├── users.py              # Usuarios y permisos
+│   │    ├── empresas.py
+│   │    ├── granjas.py
+│   │    ├── corrales.py
+│   │    ├── animales.py
+│   │    ├── gestacion.py
+│   │    ├── maternidad.py
+│   │    ├── recria.py
+│   │    ├── engorde.py
+│   │    ├── produccion.py
+│   │    ├── eventos.py
+│   │    ├── tareas.py
+│   │    ├── inventario.py
+│   │    ├── ventas.py
+│   │    └── compras.py
+│   │
+│   ├── models/                    # Modelos ORM (Pydantic/SQLAlchemy)
+│   │    ├── user.py
+│   │    ├── empresa.py
+│   │    ├── granja.py
+│   │    ├── corral.py
+│   │    ├── animal.py
+│   │    ├── gestacion.py
+│   │    ├── maternidad.py
+│   │    ├── recria.py
+│   │    ├── engorde.py
+│   │    ├── produccion.py
+│   │    ├── evento.py
+│   │    ├── tarea.py
+│   │    ├── inventario.py
+│   │    ├── venta.py
+│   │    └── compra.py
+│   │
+│   ├── crud/                      # Lógica atómica y acceso DB por entidad
+│   │    ├── user.py
+│   │    ├── empresa.py
+│   │    ├── granja.py
+│   │    ├── corral.py
+│   │    ├── animal.py
+│   │    ├── gestacion.py
+│   │    ├── maternidad.py
+│   │    ├── recria.py
+│   │    ├── engorde.py
+│   │    ├── produccion.py
+│   │    ├── evento.py
+│   │    ├── tarea.py
+│   │    ├── inventario.py
+│   │    ├── venta.py
+│   │    └── compra.py
+│   │
+│   ├── schemas/                   # Validadores (Pydantic) por entidad
+│   │    ├── user.py
+│   │    ├── empresa.py
+│   │    ├── granja.py
+│   │    ├── corral.py
+│   │    ├── animal.py
+│   │    ├── gestacion.py
+│   │    ├── maternidad.py
+│   │    ├── recria.py
+│   │    ├── engorde.py
+│   │    ├── produccion.py
+│   │    ├── evento.py
+│   │    ├── tarea.py
+│   │    ├── inventario.py
+│   │    ├── venta.py
+│   │    └── compra.py
+│   │
+│   ├── services/                  # Lógica de negocio y procesos complejos/multientidad
+│   ├── utils/                     # helpers, hashing, seguridad/tokens, logging
+│   ├── database/                  # Conexión, migraciones, inicialización BD
+│   ├── main.py                    # Punto de entrada FastAPI (crea app, monta rutas)
+│   ├── config.py                  # Configuración global (env vars, settings)
+│   └── requirements.txt           # deps Python
+│
+├── granjas_app/                   # Wrapper para compatibilidad legacy (si aplica, de lo contrario eliminar)
+│   ├── tests/                     # Pruebas unitarias y de integración
+│   ├── alembic/                   # Migraciones SQLAlchemy/Alembic
+│   └── README.md
+│
+├── frontend/                      # Proyecto de interfaz web React
+│   ├── public/                    # index.html, favicon, manifest, etc
+│   ├── assets/                    # Todo estático (imagenes, fuentes, logos)
+│   ├── src/
+│   │   ├── components/            # Componentes atómicos y organizados por dominio
+│   │   │   ├── Navbar/
+│   │   │   ├── Sidebar/
+│   │   │   ├── Cards/             # Cards de kpi/widgets reutilizables
+│   │   │   ├── Forms/
+│   │   │   ├── Dashboard/         # Dashboard principal (widgets, KPIs)
+│   │   │   ├── Granja/
+│   │   │   ├── Gestacion/
+│   │   │   ├── Maternidad/
+│   │   │   ├── Sitio2/
+│   │   │   ├── Sitio3/
+│   │   │   ├── Insumos/
+│   │   │   ├── Genetica/
+│   │   │   ├── Economico/
+│   │   │   └── ...otros módulos
+│   │   │
+│   │   ├── pages/                 # Páginas por ruta (Login, Dashboard, Error404, Perfil, etc)
+│   │   ├── services/              # API calls, lógica de datos frontend
+│   │   ├── store/                 # Estado global (Redux/Context)
+│   │   ├── templates/             # Opcional: layouts base comunes
+│   │   ├── App.tsx                # Root React/Router
+│   │   └── main.tsx
+│   │
+│   ├── package.json
+│   ├── tsconfig.json
+│   └── README.md
+│
+├── .env                           # variables sensibles (NO publiques)
+├── README.md
+├── docker-compose.yml             # Devops/orquestación
+└── database/                      # migraciones, export/import, etc
+
+
+
+
+src/
+├── App.tsx
+├── index.tsx
+├── pages/
+│
+│   ├── Dashboard.tsx
+│
+│   ├── Gestacion/
+│   │   ├── Gestacion.tsx                      // Layout y tabs principal de Gestación
+│   │   ├── GestacionRegistroMadres.tsx        // Registro de hembras/ingresos a ciclo gestante
+│   │   ├── GestacionServicios.tsx             // Registro y consulta de servicios/inseminaciones
+│   │   ├── GestacionPartosProgramados.tsx     // Programación y predicción de partos
+│   │   ├── GestacionHistorial.tsx             // Historial de gestación de cada hembra/lote
+│   │   ├── GestacionAlertas.tsx               // Alertas, vencimientos, KPIs críticos gestación
+│   │   ├── GestacionKPIs.tsx                  // Indicadores clave (Tasa de preñez, abortos, eficiencia)
+│   │   ├── GestacionReportes.tsx              // Reportes exportables y dashboard gestación
+│
+│   ├── Maternidad/
+│   │   ├── Maternidad.tsx                     // Layout y tabs principal maternidad
+│   │   ├── MaternidadIngreso.tsx              // Registro de ingreso a maternidad
+│   │   ├── MaternidadPartos.tsx               // Registro de partos y nacidos
+│   │   ├── MaternidadLactancia.tsx            // Control y consumo lactancia
+│   │   ├── MaternidadSalud.tsx                // Salud de cerdas y lechones
+│   │   ├── MaternidadMortandad.tsx            // Mortalidad y bajas
+│   │   ├── MaternidadDestete.tsx              // Destete y movimientos de lechones
+│   │   ├── MaternidadAlertas.tsx              // Alertas de maternidad
+│   │   ├── MaternidadKPIs.tsx                 // Reporte de KPIs y productividad
+│   │   ├── MaternidadReportes.tsx
+│
+│   ├── Genetica/
+│   │   ├── Genetica.tsx
+│   │   ├── GeneticaReproductores.tsx          // Registro y control verracos
+│   │   ├── GeneticaValoracion.tsx             // Valoración genética y análisis
+│   │   ├── GeneticaSeminal.tsx                // Producción seminal y calidad
+│   │   ├── GeneticaKPIs.tsx                   // KPIs genéticos y selección
+│   │   ├── GeneticaReportes.tsx
+│
+│   ├── Sitio2/
+│   │   ├── Sitio2.tsx
+│   │   ├── Sitio2Ingreso.tsx                  // Ingreso a engorde
+│   │   ├── Sitio2Corrales.tsx                 // Manejo de corrales y ubicaciones
+│   │   ├── Sitio2Nutricion.tsx                // Nutrición y alimentación fase 2
+│   │   ├── Sitio2SaludBienestar.tsx           // Salud y bienestar
+│   │   ├── Sitio2Crecimiento.tsx              // Seguimiento crecimiento
+│   │   ├── Sitio2Mortalidad.tsx               // Mortalidad y descartes
+│   │   ├── Sitio2Comercializacion.tsx         // Salidas y comercialización
+│   │   ├── Sitio2Reporte.tsx
+│
+│   ├── Sitio3/
+│   │   ├── Sitio3.tsx
+│   │   ├── Sitio3Ingreso.tsx
+│   │   ├── Sitio3Corrales.tsx
+│   │   ├── Sitio3Nutricion.tsx
+│   │   ├── Sitio3SaludBienestar.tsx
+│   │   ├── Sitio3Crecimiento.tsx
+│   │   ├── Sitio3Mortalidad.tsx
+│   │   ├── Sitio3Comercializacion.tsx
+│   │   ├── Sitio3Reporte.tsx
+│
+│   ├── Granja/
+│   │   ├── Granja.tsx
+│   │   ├── GranjaInfraestructura.tsx          // Plano, geolocalización, zonas
+│   │   ├── GranjaInstalaciones.tsx            // Edificaciones, inventario físico
+│   │   ├── GranjaServicios.tsx                // Agua, electricidad, residuos
+│   │   ├── GranjaEquipos.tsx                  // Maquinaria, equipos, herramientas
+│   │   ├── GranjaPersonal.tsx                 // RRHH, turnos, capacitaciones, organigrama
+│   │   ├── GranjaDocumentacion.tsx            // Permisos, licencias, auditorías
+│   │   ├── GranjaBioseguridad.tsx             // Bioseguridad y contingencia
+│   │   ├── GranjaEconomico.tsx                // Costos fijos y variables
+│   │   ├── GranjaEntorno.tsx                  // Relaciones comunitarias/contexto geográfico
+│   │   ├── GranjaIndicadores.tsx              // KPIs y métricas de gestión
+│   │   ├── GranjaReportes.tsx                 // Todo tipo de reportes, exportes y alertas
+│
+│   ├── Insumos/
+│   │   ├── Insumos.tsx
+│   │   ├── InsumosMedicamentos.tsx
+│   │   ├── InsumosAlimentos.tsx
+│   │   ├── InsumosEquipos.tsx
+│   │   ├── InsumosLimpieza.tsx
+│   │   ├── InsumosGenerales.tsx
+│   │   ├── InsumosCostos.tsx
+│   │   ├── InsumosReportes.tsx
+│
+│   ├── Reportes/
+│   │   ├── Reportes.tsx
+│   │   ├── ReporteProductividad.tsx
+│   │   ├── ReporteSanidad.tsx
+│   │   ├── ReporteNutricion.tsx
+│   │   ├── ReporteGenetica.tsx
+│   │   ├── ReporteCostos.tsx
+│   │   ├── ReporteAlertas.tsx
+│
+│   ├── Economico/
+│   │   ├── Economico.tsx
+│   │   ├── EconomicoIngresos.tsx
+│   │   ├── EconomicoEgresos.tsx
+│   │   ├── EconomicoCostos.tsx
+│   │   ├── EconomicoImpuestos.tsx
+│   │   ├── EconomicoKPIs.tsx
+│   │   ├── EconomicoReportes.tsx
+│
+├── components/
+│   ├── Navbar/
+│   ├── Sidebar/
+│   ├── ...otros reutilizables (TableStyled, Chart, Loader, Snackbar, etc)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/farm-manager/
+│
+├── /backend/                      # Lógica, APIs y procesos del servidor
+│   ├── /api/                      # Endpoints REST y GraphQL (si lo usas)
+│   ├── /models/                   # Modelos de base de datos (SQLAlchemy, Django ORM, etc)
+│   ├── /services/                 # Lógica de negocio (procesos, cálculos)
+│   ├── /crud/                     # Operaciones atómicas CRUD
+│   ├── /schemas/                  # Esquemas de validación (Pydantic)
+│   ├── /utils/                    # Utilidades generales (seguridad, email, helpers)
+│   ├── /database/                 # Migraciones, scripts de BD, y config
+│   ├── main.py                    # Entrada principal de la API
+│   └── config.py                  # Configuración global del backend (BD, seguridad, etc)
+│
+├── /frontend/                     # Interfaz de usuario web
+│   ├── /assets/                   # Recursos estáticos para la web
+│   │   ├── /css/                  # Hojas de estilo globales y temáticas
+│   │   ├── /js/                   # Scripts y componentes JS/React/Vue
+│   │   ├── /images/               # Imágenes y gráficos
+│   │   └── /fonts/                # Fuentes tipográficas
+│   │
+│   ├── /components/               # Componentes reutilizables (Navbar, Cards, Forms, Grids, etc)
+│   ├── /pages/                    # Páginas completas (Login, Dashboard, Granja, Gestación, etc)
+│   ├── /templates/                # Plantillas HTML base (si usas Jinja/EJS para SSR)
+│   ├── /services/                 # Lógica de llamadas a la API y manejo de datos en frontend
+│   ├── /store/                    # Estado global (Redux, Context, Pinia, según framework)
+│   ├── index.html                 # Página principal estática
+│   ├── App.js / App.vue           # Root component (React/Vue)
+│   └── main.js / main.ts          # Punto de entrada del frontend
+│
+├── /database/                     # Scripts de migración y configuración de BD principal
+│
+├── .env                           # Variables de entorno (config, claves)
+├── requirements.txt               # Dependencias Python del backend
+├── package.json                   # Dependencias JS del frontend
+├── README.md                      # Documentación general del proyecto
+├── docker-compose.yml             # Orquestación de contenedores
+└── alembic/                       # Migraciones (si usas SQLAlchemy/Alembic)
+
+
+=================================================================================
+
+granjas_app/
+│
+├── app/
+│   ├── main.py                 # Orquestador: punto de entrada FastAPI
+│   ├── config.py               # Configuración global (DB, seguridad, etc)
+│   ├── dependencies.py         # Inyección de dependencias (auth, db, etc)
+│
+│   ├── models/                 # Modelos ORM
+│   │   ├── user.py
+│   │   ├── empresa.py
+│   │   ├── granja.py
+│   │   ├── corral.py
+│   │   ├── animal.py
+│   │   ├── gestacion.py
+│   │   ├── maternidad.py
+│   │   ├── recria.py
+│   │   ├── engorde.py
+│   │   ├── produccion.py
+│   │   ├── evento.py           # Eventos clave (servicio, parto, muerte, etc)
+│   │   ├── tarea.py            # Tareas diarias/programadas
+│   │   ├── inventario.py
+│   │   ├── venta.py
+│   │   └── compra.py
+│
+│   ├── schemas/                # Validaciones y contratos de datos (Pydantic)
+│   │   ├── user.py
+│   │   ├── empresa.py
+│   │   ├── granja.py
+│   │   ├── corral.py
+│   │   ├── animal.py
+│   │   ├── gestacion.py
+│   │   ├── maternidad.py
+│   │   ├── recria.py
+│   │   ├── engorde.py
+│   │   ├── produccion.py
+│   │   ├── evento.py
+│   │   ├── tarea.py
+│   │   ├── inventario.py
+│   │   ├── venta.py
+│   │   └── compra.py
+│
+│   ├── api/
+│   │   ├── login.py
+│   │   ├── users.py
+│   │   ├── empresas.py
+│   │   ├── granjas.py
+│   │   ├── corrales.py
+│   │   ├── animales.py
+│   │   ├── gestacion.py
+│   │   ├── maternidad.py
+│   │   ├── recria.py
+│   │   ├── engorde.py
+│   │   ├── produccion.py
+│   │   ├── eventos.py
+│   │   ├── tareas.py
+│   │   ├── inventario.py
+│   │   ├── ventas.py
+│   │   └── compras.py
+│
+│   ├── crud/                   # Acceso/operaciones DB por entidad
+│   │   ├── user.py
+│   │   ├── empresa.py
+│   │   ├── granja.py
+│   │   ├── corral.py
+│   │   ├── animal.py
+│   │   ├── gestacion.py
+│   │   ├── maternidad.py
+│   │   ├── recria.py
+│   │   ├── engorde.py
+│   │   ├── produccion.py
+│   │   ├── evento.py
+│   │   ├── tarea.py
+│   │   ├── inventario.py
+│   │   ├── venta.py
+│   │   └── compra.py
+│
+│   └── utils/
+│       ├── security.py         # Seguridad, autenticación, hashing
+│       ├── email.py            # Notificaciones por email
+│       ├── logger.py           # Logs del sistema
+│       └── helpers.py
+│
+├── tests/                      # Pruebas unitarias y de integración
+│   ├── test_login.py
+│   ├── test_user.py
+│   ├── test_empresa.py
+│   ├── test_granja.py
+│   ├── test_gestacion.py
+│   ├── test_maternidad.py
+│   ├── test_recria.py
+│   ├── test_engorde.py
+│   └── test_produccion.py
+│
+├── requirements.txt
+├── .env
+├── README.md
+└── alembic/                    # Migraciones
+

@@ -1,0 +1,81 @@
+¡Perfecto!  
+Te explico **cómo personalizar y dar identidad propia** a los íconos de tu app,  
+para que sea único y represente tu empresa, proyecto o temática porcinos.
+
+***
+
+## **Opciones para personalizar íconos en React/MUI**
+
+### 1. **Usar Material Icons distintos**
+- Revisa todos los íconos disponibles en [Material Icons](https://mui.com/material-ui/material-icons/) y busca por nombre (Pig, Farm, Animals, etc.).
+- Cambia cualquier import por uno que te guste más.
+- Ejemplo:
+  ```tsx
+  import PigIcon from "@mui/icons-material/AcUnit"; // No existe el PigIcon, pero puedes crear el tuyo propio (ver abajo)
+  ```
+
+***
+
+### 2. **Usar SVG/Imagen personalizada como ícono**
+Si ningún ícono prediseñado te convence, puedes usar **SVG propio** o imagen PNG/JPG/WEBP.
+
+- Crea o descarga un archivo SVG:
+  - Puedes usar [https://iconfinder.com](https://iconfinder.com) o [Flaticon](https://www.flaticon.com/) para buscar “Pig”, “Farm”, “Baby pig”, “Corn”, “Medic”, etc.
+
+- Coloca el archivo, por ejemplo:  
+  `/src/assets/icons/pig.svg`
+
+- Usa el SVG así:
+  ```tsx
+  import { ReactComponent as PigSvg } from "../assets/icons/pig.svg";
+
+  // En el menú:
+  { text: 'Gestación', icon: <PigSvg style={{ width: 24, height: 24 }} />, path: '/gestacion' }
+  ```
+
+***
+
+### 3. **Crear íconos SVG personalizados**
+Usa herramientas como [Figma](https://figma.com), [Adobe Illustrator](https://www.adobe.com/products/illustrator.html) o [BoxySVG](https://boxy-svg.com/) para construir tu ícono propio y exportarlo como SVG.
+
+Luego lo usas igual que arriba.
+
+***
+
+### 4. **Usar imágenes PNG/JPG (solo si no tienes SVG)**
+```tsx
+// En el menú:
+import pigPng from "../assets/icons/pig.png";
+{ text: 'Gestación', icon: <img src={pigPng} style={{ width: 24, height: 24 }} />, path: '/gestacion' }
+```
+
+***
+
+## **Recomendaciones para identidad visual**
+- Usa **solo SVG o PNG** en 1-color (o adaptados a tus colores corporativos).
+- Mantén tamaño 24x24 o máximo 32x32 px para iconos de menú.
+- En Flaticon o Iconfinder puedes filtrar por “free for commercial use” si tu app es comercial.
+- Cambia los colores de los SVG con la propiedad `fill`.
+
+***
+
+## **Ejemplo práctico usando SVG personalizados**
+
+1. Descarga o diseña un SVG de pig, corral, comida, ADN, etc.
+2. Guarda en `/src/assets/icons/`.
+3. Importa y usa así:
+   ```tsx
+   import { ReactComponent as PigIcon } from '../assets/icons/pig.svg';
+   import { ReactComponent as FarmIcon } from '../assets/icons/farm.svg';
+
+   // sidebar:
+   { text: 'Gestación', icon: <PigIcon style={{ width: 24, height: 24 }} />, path: '/gestacion' },
+   { text: 'Granja', icon: <FarmIcon style={{ width: 24, height: 24 }} />, path: '/granja' },
+   ```
+
+***
+
+## **¿Necesitas que te cree los SVG/diseños personalizados?**
+Dímelo y dime el nombre/estilo que buscas (ej: “cerdo para gestación”, “corral para granja”, “ADN tipo hélice”, “bolsa de alimento para insumos”, “moneda/peso para economía”) y te entrego los SVG listos para poner.
+
+**Solo dime los módulos y qué quieres transmitir con cada ícono y te los creo o selecciono tal cual tu identidad.**
