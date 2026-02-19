@@ -1,4 +1,4 @@
-// frontend/src/components/Dashboard/Dashboard.tsx
+//src/components/Dashboard/Dashboard.tsx
 import { useEffect, useState } from "react";
 import {
   Box,
@@ -30,7 +30,7 @@ import EventIcon from "@mui/icons-material/Event";
 import ErrorIcon from "@mui/icons-material/Error";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
 import PetsIcon from "@mui/icons-material/Pets";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import {
   getIndicadores,
   getEventosTareas,
@@ -74,8 +74,6 @@ type UiAlertState = { msg: string; type: "success" | "error" } | null;
 export default function Dashboard({ isAuthenticated }: DashboardProps) {
   const [tab, setTab] = useState(0);
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const [loading, setLoading] = useState(false);
   const [uiAlert, setUiAlert] = useState<UiAlertState>(null);
 
   // Datos del dashboard
@@ -87,7 +85,6 @@ export default function Dashboard({ isAuthenticated }: DashboardProps) {
 
   const cargarDatos = async () => {
     try {
-      setLoading(true);
       const [ind, evt, res] = await Promise.all([
         getIndicadores(),
         getEventosTareas(false),
@@ -101,8 +98,6 @@ export default function Dashboard({ isAuthenticated }: DashboardProps) {
         msg: e?.message || "Error cargando datos del dashboard",
         type: "error",
       });
-    } finally {
-      setLoading(false);
     }
   };
 

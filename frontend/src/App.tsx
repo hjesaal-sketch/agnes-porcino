@@ -1,3 +1,4 @@
+//src/App.tsx
 import React, { useState, useEffect } from "react";
 import {
   BrowserRouter as Router,
@@ -70,7 +71,7 @@ function AppRoutes() {
       const savedUser = getUserFromStorage();
       if (savedUser) setUser(savedUser);
     }
-  }, []);
+  }, [user]);
 
   const handleLogin = async (email: string, password: string) => {
     setLoginError("");
