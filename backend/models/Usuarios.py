@@ -13,13 +13,13 @@ from backend.database import Base
 
 
 class RolUsuario(str, Enum):
-    OWNER = "OWNER"                  # Dueño Empresa
-    COMPANY_MANAGER = "COMPANY_MANAGER"      # Gerente General
-    FARM_MANAGER = "FARM_MANAGER"            # Gerente de Granja
-    SYSTEM_OPERATOR = "SYSTEM_OPERATOR"      # Operador / Gerente adjunto
-    ECON_MANAGER = "ECON_MANAGER"            # Administrador / Contador / Economista
-    CONSULTANT = "CONSULTANT"                # Consultor
-    VET = "VET"                              # Veterinario
+    OWNER = "Dueño"
+    COMPANY_MANAGER = "Gerente General"
+    FARM_MANAGER = "Gerente de Granja"
+    SYSTEM_OPERATOR = "Operador"
+    ECON_MANAGER = "Administrador"
+    CONSULTANT = "Consultor"
+    VET = "Veterinario"
 
 
 class UsuarioModel(Base):
@@ -29,7 +29,6 @@ class UsuarioModel(Base):
     empresa_id = Column(Integer, ForeignKey("empresas.id"), nullable=False)
     nombre = Column(String(120), nullable=False)
     email = Column(String(120), unique=True, nullable=False, index=True)
-    # Se almacena el valor del enum (OWNER, COMPANY_MANAGER, etc.)
     rol = Column(String(50), nullable=False)
     activo = Column(Boolean, nullable=False, default=True)
     ultima_sesion = Column(DateTime, nullable=True)
