@@ -89,6 +89,10 @@ class UsuarioRepository:
         return self.db.query(UsuarioModel).filter(UsuarioModel.email == email).first()
 
     def crear(self, data: UsuarioCreate) -> UsuarioModel:
+        from backend.models.user import User
+        from backend.utils.security import get_password_hash
+        
+        # Crear en tabla usuarios
         usuario = UsuarioModel(
             empresa_id=data.empresa_id,
             nombre=data.nombre,
@@ -97,6 +101,17 @@ class UsuarioRepository:
             activo=data.activo,
         )
         self.db.add(usuario)
+        
+        # También crear en tabla users con contraseña temporal
+        user_auth = User(
+            nombre=data.nombre,
+            email=data.email,
+            hashed_password=get_password_hash("temporal123"),
+            role=data.rol.value,
+            empresa_id=data.empresa_id,
+        )
+        self.db.add(user_auth)
+        
         self.db.commit()
         self.db.refresh(usuario)
         return usuario
@@ -119,9 +134,17 @@ class UsuarioRepository:
         return usuario
 
     def eliminar(self, id: int) -> bool:
+        from backend.models.user import User
+        
         usuario = self.obtener_por_id(id)
         if not usuario:
             return False
+        
+        # Eliminar también de tabla users
+        user_auth = self.db.query(User).filter(User.email == usuario.email).first()
+        if user_auth:
+            self.db.delete(user_auth)
+        
         self.db.delete(usuario)
         self.db.commit()
         return True
