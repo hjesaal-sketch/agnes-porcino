@@ -1,3 +1,3 @@
 // src/config/api.ts
-const API_BASE = "https://web-production-3b119.up.railway.app/api";
+const API_BASE = "https://agnes-porcino.onrender.com/api";
 export default API_BASE;
