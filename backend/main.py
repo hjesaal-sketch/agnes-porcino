@@ -105,17 +105,16 @@ app = FastAPI(
     version="1.0.0",
 )
 
-# CORS: permite al frontend (React en localhost:3000) consumir la API
+# CORS: permite al frontend consumir la API
 origins = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
+    "https://agnes-porcino.vercel.app",
 ]
-
-#origins = ["*"]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,      # puedes poner ["*"] si necesitas abrir todo en desarrollo
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
