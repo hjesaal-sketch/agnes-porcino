@@ -47,10 +47,13 @@ const CONTENT_MAX_WIDTH = 1050;
 type UiAlertState = { msg: string; type: "success" | "error" } | null;
 
 const roles: RolUsuario[] = [
+  "Dueño",
+  "Gerente General",
+  "Gerente de Granja",
+  "Operador",
   "Administrador",
+  "Consultor",
   "Veterinario",
-  "Operario",
-  "Consulta",
 ];
 
 const menu = [
