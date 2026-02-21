@@ -73,7 +73,7 @@ const menu = [
 const emptyForm = {
   nombre: "",
   email: "",
-  rol: "Operario" as RolUsuario,
+  rol: "Operador" as RolUsuario,
   activo: true,
 };
 
@@ -108,7 +108,7 @@ export default function Usuarios() {
   const total = usuarios.length;
   const activos = usuarios.filter((u) => u.activo).length;
   const admins = usuarios.filter((u) => u.rol === "Administrador").length;
-  const operarios = usuarios.filter((u) => u.rol === "Operario").length;
+  const operarios = usuarios.filter((u) => u.rol === "Operador").length;
 
   const limpiarForm = () => setForm(emptyForm);
 
@@ -275,7 +275,7 @@ export default function Usuarios() {
                   variant="outlined"
                 />
                 <Chip
-                  label={`Operarios: ${operarios}`}
+                  label={`Operadores: ${operarios}`}
                   variant="outlined"
                 />
               </Box>
