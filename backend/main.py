@@ -228,6 +228,36 @@ async def startup():
   """Ejecuta seed de datos al iniciar la aplicación"""
   db = SessionLocal()
   try:
+              # Crear las tablas si no existen
+              Base.metadata.create_all(bind=engine)
+
+            # Crear usuario admin y empresa demo si no existen
+            from backend.models.user import User
+        from backend.models.empresa import Empresa
+        from backend.utils.security import get_password_hash
+
+        empresa_nombre = "Empresa Demo"
+        empresa = db.query(Empresa).filter_by(nombre=empresa_nombre).first()
+        if not empresa:
+                        empresa = Empresa(nombre=empresa_nombre)
+                        db.add(empresa)
+                        db.commit()
+                        db.refresh(empresa)
+
+        admin_email = "admin@empresa.com"
+        admin = db.query(User).filter_by(email=admin_email).first()
+        if not admin:
+                        admin = User(
+                                            nombre="Admin General",
+                                            email=admin_email,
+                                            hashed_password=get_password_hash("admin123"),
+                                            role="admin",
+                                            empresa_id=empresa.id
+                                        )
+                        db.add(admin)
+                        db.commit()
+
+
       seed_dashboard(db)
   except Exception as e:
       print(f"❌ Error al ejecutar seed: {e}")
