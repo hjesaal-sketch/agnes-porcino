@@ -242,4 +242,18 @@ async def startup():
                 email=admin_email,
                 hashed_password=get_password_hash("admin123"),
                 role="admin",
-                empresa_id=empresa
+                empresa_id=empresa.id
+            )
+            db.add(admin)
+            db.commit()
+            db.refresh(admin)
+
+        seed_dashboard(db)
+    except Exception as e:
+        print(f"❌ Error al ejecutar seed: {e}")
+    finally:
+        db.close()
+
+@app.get("/ping")
+def ping():
+    return {"status": "ok"}
