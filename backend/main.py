@@ -235,7 +235,7 @@ async def startup():
               Base.metadata.create_all(bind=engine)
 
             # Crear usuario admin y empresa demo si no existen
-                empresa_nombre = "Empresa Demo"        
+        empresa_nombre = "Empresa Demo"
         empresa = db.query(Empresa).filter_by(nombre=empresa_nombre).first()
         if not empresa:
                         empresa = Empresa(nombre=empresa_nombre)
