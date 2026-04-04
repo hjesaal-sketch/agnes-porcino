@@ -4,6 +4,9 @@ from fastapi.middleware.cors import CORSMiddleware
 import logging
 
 from backend.database import engine, Base
+from backend.models.user import User
+from backend.models.empresa import Empresa
+from backend.utils.security import get_password_hash
 import backend.models.core.granjas  # importa y registra Granja + modelos con FK
 from backend.seeds.dashboard_seed import seed_dashboard
 from backend.database import SessionLocal  # ✅ CORRECTO
@@ -232,10 +235,6 @@ async def startup():
               Base.metadata.create_all(bind=engine)
 
             # Crear usuario admin y empresa demo si no existen
-        from backend.models.user import User
-        from backend.models.empresa import Empresa
-        from backend.utils.security import get_password_hash
-        
         empresa_nombre = "Empresa Demo"        
         empresa = db.query(Empresa).filter_by(nombre=empresa_nombre).first()
         if not empresa:
