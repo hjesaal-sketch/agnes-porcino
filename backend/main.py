@@ -92,13 +92,9 @@ from backend.api.reportes.Costos import router as reportes_costos_router
 from backend.api.reportes.Alertas import router as reportes_alertas_router
 
 from backend.api.animales import Resumen as AnimalesResumenRouter
-
 from backend.api.Productividad import router as productividad_router
-
 from backend.api.Estadisticas import router as estadisticas_router
-
 from backend.api.Usuarios import router as usuarios_router
-
 from backend.api.Dashboard import router as dashboard_router
 from backend.api.condicion_corporal import Backfat as BackfatRouter
 
@@ -214,56 +210,36 @@ app.include_router(reportes_costos_router, prefix="/api")
 app.include_router(reportes_alertas_router, prefix="/api")
 
 app.include_router(AnimalesResumenRouter.router, prefix="/api")
-
 app.include_router(productividad_router, prefix="/api")
-
 app.include_router(estadisticas_router, prefix="/api")
-
 app.include_router(usuarios_router, prefix="/api")
-
 app.include_router(dashboard_router, prefix="/api")
-
 app.include_router(BackfatRouter.router, prefix="/api")
-
 
 @app.on_event("startup")
 async def startup():
-  """Ejecuta seed de datos al iniciar la aplicación"""
-  db = SessionLocal()
-  try:
-              # Crear las tablas si no existen
-              Base.metadata.create_all(bind=engine)
-
-            # Crear usuario admin y empresa demo si no existen
+    """Ejecuta seed de datos al iniciar la aplicación"""
+    db = SessionLocal()
+    try:
+        # Crear las tablas si no existen
+        Base.metadata.create_all(bind=engine)
+        
+        # Crear usuario admin y empresa demo si no existen
         empresa_nombre = "Empresa Demo"
+        
         empresa = db.query(Empresa).filter_by(nombre=empresa_nombre).first()
         if not empresa:
-                        empresa = Empresa(nombre=empresa_nombre)
-                        db.add(empresa)
-                        db.commit()
-                        db.refresh(empresa)
-
+            empresa = Empresa(nombre=empresa_nombre)
+            db.add(empresa)
+            db.commit()
+            db.refresh(empresa)
+        
         admin_email = "admin@empresa.com"
         admin = db.query(User).filter_by(email=admin_email).first()
         if not admin:
-                        admin = User(
-                                            nombre="Admin General",
-                                            email=admin_email,
-                                            hashed_password=get_password_hash("admin123"),
-                                            role="admin",
-                                            empresa_id=empresa.id
-                                        )
-                        db.add(admin)
-                        db.commit()
-
-
-      seed_dashboard(db)
-  except Exception as e:
-      print(f"❌ Error al ejecutar seed: {e}")
-  finally:
-      db.close()
-
-
-@app.get("/ping")
-def ping():
-    return {"status": "ok"}
+            admin = User(
+                nombre="Admin General",
+                email=admin_email,
+                hashed_password=get_password_hash("admin123"),
+                role="admin",
+                empresa_id=empresa
