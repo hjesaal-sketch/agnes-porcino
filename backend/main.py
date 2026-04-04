@@ -235,8 +235,8 @@ async def startup():
         from backend.models.user import User
         from backend.models.empresa import Empresa
         from backend.utils.security import get_password_hash
-        empresa_nombre = "Empresa Demo"
         
+        empresa_nombre = "Empresa Demo"        
         empresa = db.query(Empresa).filter_by(nombre=empresa_nombre).first()
         if not empresa:
                         empresa = Empresa(nombre=empresa_nombre)
