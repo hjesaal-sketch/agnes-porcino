@@ -9,9 +9,6 @@ from backend.models.empresa import Empresa
 
 
 
-    granjas = relationship("Granja", back_populates="empresa")
-
-
 class Granja(Base):
     __tablename__ = "granjas"
 
