@@ -34,8 +34,7 @@ import PeopleIcon from "@mui/icons-material/People";
 import { useNavigate } from "react-router-dom";
 import {
   getUsuarios,
-  addUsuario,
-  updateUsuario,
+  createUsuario,  updateUsuario,
   deleteUsuario,
   Usuario,
   RolUsuario,
@@ -136,7 +135,7 @@ export default function Usuarios() {
           type: "success",
         });
       } else {
-        const nuevo = await addUsuario({
+        const nuevo = await createUsuario({
           nombre: form.nombre,
           email: form.email,
           rol: form.rol,
