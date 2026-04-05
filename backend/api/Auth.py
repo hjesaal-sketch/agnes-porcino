@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 from backend.database import get_db
-from backend.models.Usuarios import Usuario
+from backend.models.user import User
 import bcrypt
 
 router = APIRouter()
@@ -13,7 +13,7 @@ class LoginRequest(BaseModel):
 
 @router.post("/login")
 async def login(request: LoginRequest, db: Session = Depends(get_db)):
-    usuario = db.query(Usuario).filter(Usuario.email == request.email).first()
+    usuario = db.query(User).filter(User.email == request.email).first()
     
     if not usuario:
         raise HTTPException(status_code=401, detail="Usuario o contraseña inválidos")
