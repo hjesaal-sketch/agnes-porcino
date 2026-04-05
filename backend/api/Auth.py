@@ -1,4 +1,4 @@
-Auth.pyfrom fastapi import APIRouter, HTTPException, Depends
+rom fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 from backend.database import get_db
