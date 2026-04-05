@@ -1,7 +1,7 @@
 // frontend/src/services/Usuarios.ts
 import API_BASE from "../config/api";
 
-export type RolUsuario = "Dueño" | "Gerente General" | "Gerente de Granja" | "Operador" | "Administrador" | "Consultor" | "Maestro";
+export type RolUsuario = "Dueño" | "Gerente General" | "Gerente de Granja" | "Operador" | "Administrador" | "Consultor" | "Veterinario" | "Maestro";
 
 export type Usuario = {
   id: number;
