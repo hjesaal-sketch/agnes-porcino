@@ -12,6 +12,7 @@ import {
 import Navbar from "./components/Navbar/Navbar";
 import LoginForm from "./components/Forms/LoginForm";
 import Dashboard from "./components/Dashboard/Dashboard";
+import { login as apiLogin } from "../services/api";
 
 // VISTAS PRINCIPALES
 import Estadisticas from "./pages/Estadisticas/Estadisticas";
@@ -39,15 +40,8 @@ type UserType = {
 };
 
 async function login(email: string, password: string) {
-  const resp = await fetch("http://localhost:8000/api/login", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password }),
-  });
-  if (!resp.ok) throw new Error("Usuario o contraseña inválidos");
-  return await resp.json();
+  return apiLogin(email, password);
 }
-
 function saveSession(token: string, user: UserType) {
   localStorage.setItem("token", token);
   localStorage.setItem("user", JSON.stringify(user));
