@@ -236,7 +236,7 @@ async def startup():
                 email=admin_email,
                 hashed_password=get_password_hash("admin123"),
                 role="admin",
-                empresa_id=empresa.id
+                empresa_id=empresa.id,
             )
             db.add(admin)
             db.commit()
