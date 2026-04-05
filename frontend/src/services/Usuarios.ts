@@ -1,7 +1,7 @@
-# frontend/src/services/Usuarios.ts
+// frontend/src/services/Usuarios.ts
 import API_BASE from "../config/api";
 
-export type RolUsuario = "Dueño" | "Gerente General" | "Gerente de Granja" | "Operador" | "Administrador" | "Consultor" | "Veterinario";
+export type RolUsuario = "Dueño" | "Gerente General" | "Gerente de Granja" | "Operador" | "Administrador" | "Consultor" | "Maestro";
 
 export type Usuario = {
   id: number;
@@ -33,30 +33,34 @@ export async function getUsuarios(): Promise<Usuario[]> {
   const url = new URL(`${API_BASE}/usuarios/`, window.location.origin);
   url.searchParams.set("empresa_id", String(EMPRESA_ID));
 
-  const res = await fetch(url.toString());
+  const res = await fetch(url.toString(), {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+  });
+
   if (!res.ok) {
-    throw new Error("Error al obtener usuarios");
+    const error = await res.json();
+    throw new Error(error.detail || "Error al obtener usuarios");
   }
+
   const data = await res.json();
   return data.map(mapApiToUsuario);
 }
 
-export async function addUsuario(
-  payload: Omit<NuevoUsuario, "empresa_id">
+export async function createUsuario(
+  body: NuevoUsuario
 ): Promise<Usuario> {
-  const body = {
-    empresa_id: EMPRESA_ID,
-    ...payload,
-  };
   const res = await fetch(`${API_BASE}/usuarios/`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
   });
+
   if (!res.ok) {
     const error = await res.json();
     throw new Error(error.detail || "Error al crear usuario");
   }
+
   const data = await res.json();
   return mapApiToUsuario(data);
 }
@@ -70,9 +74,11 @@ export async function updateUsuario(
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
+
   if (!res.ok) {
     throw new Error("Error al actualizar usuario");
   }
+
   const data = await res.json();
   return mapApiToUsuario(data);
 }
@@ -81,6 +87,7 @@ export async function deleteUsuario(id: number): Promise<void> {
   const res = await fetch(`${API_BASE}/usuarios/${id}`, {
     method: "DELETE",
   });
+
   if (!res.ok) {
     throw new Error("Error al eliminar usuario");
   }
