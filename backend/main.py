@@ -106,11 +106,7 @@ app = FastAPI(
 )
 
 # CORS: permite al frontend consumir la API
-origins = [
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-    "https://agnes-porcino.vercel.app",
-]
+origins = [["*"]
 
 app.add_middleware(
     CORSMiddleware,
