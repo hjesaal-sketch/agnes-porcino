@@ -5,25 +5,9 @@ from datetime import datetime
 from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 from backend.database import Base, engine
+from backend.models.empresa import Empresa
 
 
-class Empresa(Base):
-    __tablename__ = "empresas"
-
-    id = Column(Integer, primary_key=True, index=True)
-    nombre = Column(String(150), nullable=False)
-    rif = Column(String(50), nullable=True)
-    direccion = Column(Text, nullable=True)
-    telefono = Column(String(50), nullable=True)
-    email = Column(String(150), nullable=True)
-
-    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
-    updated_at = Column(
-        DateTime,
-        nullable=False,
-        default=datetime.utcnow,
-        onupdate=datetime.utcnow,
-    )
 
     granjas = relationship("Granja", back_populates="empresa")
 
