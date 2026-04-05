@@ -108,8 +108,8 @@ app = FastAPI(
 # CORS: permite al frontend consumir la API
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://agnes-porcino.vercel.app"],
-    allow_credentials=False,
+    allow_origins=["*"],   
+        allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
