@@ -12,7 +12,7 @@ from backend.seeds.dashboard_seed import seed_dashboard
 from backend.database import SessionLocal  # ✅ CORRECTO
 
 # Routers reales según tu árbol de carpetas
-from backend.api.login import router as login_router
+from backend.api.Auth import router as login_router
 from backend.api.gestacion.Alertas import router as gestacion_alertas_router
 from backend.api.gestacion.Madres import router as gestacion_madres_router
 from backend.api.gestacion.Servicios import router as gestacion_servicios_router
