@@ -106,8 +106,7 @@ app = FastAPI(
 )
 
 # CORS: permite al frontend consumir la API
-origins = [["*"]
-
+origins = ["*"]
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
