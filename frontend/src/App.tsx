@@ -12,7 +12,7 @@ import {
 import Navbar from "./components/Navbar/Navbar";
 import LoginForm from "./components/Forms/LoginForm";
 import Dashboard from "./components/Dashboard/Dashboard";
-import { login as apiLogin, warmupBackend } from "./services/api";// VISTAS PRINCIPALES
+import { login as apiLogin } from "./services/api";// VISTAS PRINCIPALES, warmupBackend } from "./services/api";// VISTAS PRINCIPALES
 import Estadisticas from "./pages/Estadisticas/Estadisticas";
 import Productividad from "./pages/Productividad/Productividad";
 import Usuarios from "./pages/Usuarios/Usuarios";
@@ -38,8 +38,6 @@ type UserType = {
 };
 
 async function login(email: string, password: string) {
-    // Warm up Render backend (fix cold start)
-  await warmupBackend();
   return apiLogin(email, password);
 }
 function saveSession(token: string, user: UserType) {
