@@ -6,6 +6,7 @@ import logging
 from backend.database import engine, Base
 import backend.models.core.granjas  # importa y registra Granja + modelos con FK
 from backend.seeds.dashboard_seed import seed_dashboard
+from backend.seeds.users_seed import seed_users
 from backend.database import SessionLocal  # ✅ CORRECTO
 
 # Routers reales según tu árbol de carpetas
@@ -229,6 +230,7 @@ async def startup():
   db = SessionLocal()
   try:
       seed_dashboard(db)
+      seed_users(db)
   except Exception as e:
       print(f"❌ Error al ejecutar seed: {e}")
   finally:

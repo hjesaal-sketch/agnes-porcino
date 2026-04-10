@@ -1,4 +1,5 @@
-// src/services/Historial.ts
+// frontend/src/services/gestacion/Historial.ts
+import API_BASE from "../../config/api";
 
 export type TipoEventoHistorial =
   | "Servicio"
@@ -18,7 +19,6 @@ export type HistorialGestacion = {
   observaciones: string;
 };
 
-const API_BASE = "http://127.0.0.1:8000/api";
 const EMPRESA_ID = 1;
 const GRANJA_ID = 1;
 
