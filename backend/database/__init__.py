@@ -4,11 +4,7 @@ from sqlalchemy.orm import sessionmaker
 import os
 
 # URL de la base de datos desde variable de entorno
-DATABASE_URL = os.getenv("DATABASE_URL")
-
-if not DATABASE_URL:
-    raise ValueError("DATABASE_URL environment variable is not set")
-
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///granjas.db")
 # Crear el engine de SQLAlchemy
 engine = create_engine(DATABASE_URL)
 
