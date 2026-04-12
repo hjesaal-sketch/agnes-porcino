@@ -41,8 +41,7 @@ from backend.api.insumos import Reportes as InsumosReportesRouter
 
 from backend.api.granja import Bioseguridad as GranjaBioseguridadRouter
 from backend.api.granja import Documentacion as GranjaDocumentacionRouter
-from backend.api.granja import Economico as GranjaEconomicoRouter
-from backend.api.granja import Entorno as GranjaEntornoRouter
+CORSMiddlewarefrom backend.api.granja import Entorno as GranjaEntornoRouter
 from backend.api.granja import Equipos as GranjaEquiposRouter
 from backend.api.granja import Indicadores as GranjaIndicadoresRouter
 from backend.api.granja import Infraestructura as GranjaInfraestructuraRouter
@@ -108,8 +107,8 @@ app = FastAPI(
 # CORS: permite al frontend consumir la API
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],   
-        allow_credentials=False,
+    allow_origins=["https://agnes-porcino.vercel.app"],   
+        allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
