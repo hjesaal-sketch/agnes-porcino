@@ -29,7 +29,7 @@ class Empresa(Base):
     )
 
     # Relación con granjas
-granjas: Mapped[List["Granja"]] = relationship(
+granjas = relationship(
         "Granja",
         back_populates="empresa",
         cascade="all, delete-orphan",
