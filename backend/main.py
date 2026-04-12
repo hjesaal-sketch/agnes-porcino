@@ -41,7 +41,8 @@ from backend.api.insumos import Reportes as InsumosReportesRouter
 
 from backend.api.granja import Bioseguridad as GranjaBioseguridadRouter
 from backend.api.granja import Documentacion as GranjaDocumentacionRouter
-CORSMiddlewarefrom backend.api.granja import Entorno as GranjaEntornoRouter
+from backend.api.granja import Economico as GranjaEconomicoRouter
+from backend.api.granja import Entorno as GranjaEntornoRouter
 from backend.api.granja import Equipos as GranjaEquiposRouter
 from backend.api.granja import Indicadores as GranjaIndicadoresRouter
 from backend.api.granja import Infraestructura as GranjaInfraestructuraRouter
