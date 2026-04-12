@@ -5,7 +5,7 @@ from datetime import datetime
 from typing import Optional, List
 
 from sqlalchemy import Column, Integer, String, DateTime, Text
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, Mapped
 
 from backend.database import Base
 
@@ -29,7 +29,7 @@ class Empresa(Base):
     )
 
     # Relación con granjas
-    granjas: List["Granja"] = relationship(
+    Mapped[List["Granja"]]] = relationship(
         "Granja",
         back_populates="empresa",
         cascade="all, delete-orphan",
