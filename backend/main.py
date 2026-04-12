@@ -5,7 +5,7 @@ import logging
 
 from backend.database import engine, Base
 from backend.models.user import User
-from backend.models.empresa import Empresa
+from backend.models.core.Empresas import Empresa  # modelo completo con relaci�n granjas
 from backend.utils.security import get_password_hash
 import backend.models.core.granjas  # importa y registra Granja + modelos con FK
 from backend.seeds.dashboard_seed import seed_dashboard
