@@ -391,6 +391,7 @@ export default function Dashboard({ isAuthenticated }: DashboardProps) {
               </Card>
             </Box>
           </>
+      </Box>
         )}
 
         {tab === 1 && (
