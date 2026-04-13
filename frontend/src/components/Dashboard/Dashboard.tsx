@@ -76,7 +76,6 @@ export default function Dashboard({ isAuthenticated }: DashboardProps) {
   const navigate = useNavigate();
   const [uiAlert, setUiAlert] = useState<UiAlertState>(null);
 
-  // Datos del dashboard
   const [indicadores, setIndicadores] = useState<IndicadorStats | null>(null);
   const [eventos, setEventos] = useState<EventoTarea[]>([]);
   const [resumenReproductivo, setResumenReproductivo] = useState<
@@ -105,7 +104,6 @@ export default function Dashboard({ isAuthenticated }: DashboardProps) {
     cargarDatos();
   }, []);
 
-  // Mapear indicadores a cards dinámicas
   const indicatorStats = indicadores
     ? [
         {
@@ -165,10 +163,9 @@ export default function Dashboard({ isAuthenticated }: DashboardProps) {
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setTab(newValue);
 
-    // Mapeo de tabs a rutas
     const tabRoutes = [
-      "/dashboard", // 0 - Visión General
-      "/reportes", // 1 - Análisis (Indicadores + Historial + Reportes)
+      "/dashboard",
+      "/reportes",
     ];
 
     navigate(tabRoutes[newValue]);
@@ -227,10 +224,8 @@ export default function Dashboard({ isAuthenticated }: DashboardProps) {
           </Tabs>
         </Box>
 
-        {/* Mostrar contenido solo en la primera tab (Visión General) */}
         {tab === 0 && (
           <>
-            {/* Indicadores dinámicos */}
             <Stack
               direction="row"
               spacing={2}
@@ -258,9 +253,7 @@ export default function Dashboard({ isAuthenticated }: DashboardProps) {
                         }}
                       >
                         {stat.icon}
-                        <Typography
-                          sx={{ fontSize: 15, fontWeight: 700 }}
-                        >
+                        <Typography sx={{ fontSize: 15, fontWeight: 700 }}>
                           {stat.label}
                         </Typography>
                       </Box>
@@ -286,7 +279,6 @@ export default function Dashboard({ isAuthenticated }: DashboardProps) {
                 alignItems: "stretch",
               }}
             >
-              {/* Gráfica de Resumen Reproductivo */}
               <Card
                 sx={{
                   flex: 2,
@@ -361,7 +353,6 @@ export default function Dashboard({ isAuthenticated }: DashboardProps) {
                 </CardContent>
               </Card>
 
-              {/* Próximos eventos y tareas */}
               <Card
                 sx={{
                   flex: 1,
@@ -407,48 +398,6 @@ export default function Dashboard({ isAuthenticated }: DashboardProps) {
               </Card>
             </Box>
           </>
-        )}
-        
-              {/* Próximos eventos y tareas */}
-              <Card sx={{ flex: 1, minWidth: 240, minHeight: 300 }}>
-                <CardContent>
-                  <Typography
-                    variant="h6"
-                    sx={{ fontWeight: "bold", mb: 2 }}
-                  >
-                    <EventIcon color="primary" sx={{ mr: 1 }} />
-                    Próximos eventos y tareas
-                  </Typography>
-                  {eventos.length > 0 ? (
-                    <Box sx={{ maxHeight: 250, overflowY: "auto" }}>
-                      {eventos.slice(0, 5).map((evento) => (
-                        <Typography
-                          key={evento.id}
-                          variant="body2"
-                          sx={{
-                            mb: 1,
-                            pb: 1,
-                            borderBottom: "1px solid #eee",
-                          }}
-                        >
-                          <strong>{evento.tipo}:</strong> {evento.descripcion} (
-                          {evento.cantidad}) -{" "}
-                          {new Date(
-                            evento.fecha_evento
-                          ).toLocaleDateString()}
-                        </Typography>
-                      ))}
-                    </div>
-                  ) : (
-                    <Typography variant="body2" sx={{ color: "#666" }}>
-                      Sin eventos próximos
-                    </Typography>
-                  )}
-                </CardContent>
-              </Card>
-            </Box>
-          </>
-      </Box>
         )}
 
         {tab === 1 && (
