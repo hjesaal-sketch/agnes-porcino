@@ -1,11 +1,9 @@
 # backend/models/core/granjas.py
-from __future__ import annotations
 
 from datetime import datetime
 from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 from backend.database import Base, engine
-from backend.models.core.Empresas import Empresa  # misma clase Empresa con relaci�n granjas
 
 
 class Granja(Base):
