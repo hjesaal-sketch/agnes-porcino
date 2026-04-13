@@ -27,7 +27,7 @@ import InventoryIcon from "@mui/icons-material/Inventory";
 import ScienceIcon from "@mui/icons-material/Science";
 import RoomIcon from "@mui/icons-material/Room";
 import BarChartIcon from "@mui/icons-material/BarChart";
-imort MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
+import  MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
 
 import ErrorIcon from "@mui/icons-material/Error";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
