@@ -29,8 +29,8 @@ class Empresa(Base):
     )
 
     # Relación con granjas
-granjas = relationship(
-        "Granja",
-        back_populates="empresa",
+    granjas = relationship(
+                "Granja",
+        backref="empresa",
         cascade="all, delete-orphan",
     )
