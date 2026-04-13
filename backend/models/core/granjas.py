@@ -1,9 +1,13 @@
 # backend/models/core/granjas.py
+from typing import TYPE_CHECKING
 
 from datetime import datetime
 from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 from backend.database import Base, engine
+
+if TYPE_CHECKING:
+    from backend.models.core.Empresas import Empresa
 
 
 class Granja(Base):
