@@ -16,6 +16,9 @@ import {
   Stack,
   Snackbar,
   Alert as MuiAlert,
+  Grid2 as Grid,
+  Paper,
+  CircularProgress,
 } from "@mui/material";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import LocalHospitalIcon from "@mui/icons-material/LocalHospital";
@@ -65,22 +68,38 @@ const menu = [
   { text: "Económico", icon: <MonetizationOnIcon />, path: "/economico" },
 ];
 
-type DashboardProps = {
-  isAuthenticated: boolean;
+type DashboardProps = { isAuthenticated: boolean };
+type UiAlertState = { msg: string; type: "success" | "error" } | null;
+
+const iconMap: Record<string, React.ReactElement> = {
+  partos: <LocalHospitalIcon />,
+  fallos: <ErrorIcon />,
+  mortalidad: <PetsIcon />,
+  alimento: <RestaurantIcon />,
+  medicamento: <InventoryIcon />,
+  celos: <LocalHospitalIcon />,
+  destete: <BabyIcon />,
 };
 
-type UiAlertState = { msg: string; type: "success" | "error" } | null;
+const getStatIcon = (label: string) => {
+  const key = label.toLowerCase().split(" ")[0];
+  if (key.includes("parto")) return iconMap.partos;
+  if (key.includes("fallo")) return iconMap.fallos;
+  if (key.includes("mortalidad")) return iconMap.mortalidad;
+  if (key.includes("alimento")) return iconMap.alimento;
+  if (key.includes("medicamento")) return iconMap.medicamento;
+  if (key.includes("celo")) return iconMap.celos;
+  if (key.includes("destete")) return iconMap.destete;
+  return <DashboardIcon />;
+};
 
 export default function Dashboard({ isAuthenticated }: DashboardProps) {
   const [tab, setTab] = useState(0);
   const navigate = useNavigate();
   const [uiAlert, setUiAlert] = useState<UiAlertState>(null);
-
   const [indicadores, setIndicadores] = useState<IndicadorStats | null>(null);
   const [eventos, setEventos] = useState<EventoTarea[]>([]);
-  const [resumenReproductivo, setResumenReproductivo] = useState<
-    ResumenReproductivo[]
-  >([]);
+  const [resumenReproductivo, setResumenReproductivo] = useState<ResumenReproductivo[]>([]);
 
   const cargarDatos = async () => {
     try {
@@ -93,10 +112,7 @@ export default function Dashboard({ isAuthenticated }: DashboardProps) {
       setEventos(evt);
       setResumenReproductivo(res);
     } catch (e: any) {
-      setUiAlert({
-        msg: e?.message || "Error cargando datos del dashboard",
-        type: "error",
-      });
+      setUiAlert({ msg: e?.message || "Error cargando datos del dashboard", type: "error" });
     }
   };
 
@@ -106,55 +122,13 @@ export default function Dashboard({ isAuthenticated }: DashboardProps) {
 
   const indicatorStats = indicadores
     ? [
-        {
-          label: "Próximos partos",
-          value: indicadores.proximos_partos,
-          icon: <AgriculturalIcon />,
-          color: "#f8fafc",
-          tooltip: "Hembras próximas a parto",
-        },
-        {
-          label: "Fallos reproductivos",
-          value: indicadores.fallos_reproductivos,
-          icon: <ErrorIcon />,
-          color: "#fff0f1",
-          tooltip: "Inseminaciones no exitosas",
-        },
-        {
-          label: "Mortalidad",
-          value: indicadores.mortalidad,
-          icon: <LocalHospitalIcon />,
-          color: "#f3e8ff",
-          tooltip: "Mortalidad reciente",
-        },
-        {
-          label: "Alimento bajo",
-          value: indicadores.alimento_bajo,
-          icon: <RestaurantIcon />,
-          color: "#fffbe7",
-          tooltip: "Inventario bajo de alimento",
-        },
-        {
-          label: "Medicamento bajo",
-          value: indicadores.medicamento_bajo,
-          icon: <ScienceIcon />,
-          color: "#e1f5fe",
-          tooltip: "Inventario bajo de medicamento",
-        },
-        {
-          label: "Celos recientes",
-          value: indicadores.celos_recientes,
-          icon: <PetsIcon />,
-          color: "#fce4ec",
-          tooltip: "Detectados en los últimos días",
-        },
-        {
-          label: "Listos para destete",
-          value: indicadores.listos_destete,
-          icon: <BabyIcon />,
-          color: "#e8fce7",
-          tooltip: "Lotes listos para destetar",
-        },
+        { label: "Próximos partos", value: indicadores.proximos_partos },
+        { label: "Fallos reproductivos", value: indicadores.fallos_reproductivos },
+        { label: "Mortalidad", value: indicadores.mortalidad },
+        { label: "Alimento bajo", value: indicadores.alimento_bajo },
+        { label: "Medicamento bajo", value: indicadores.medicamento_bajo },
+        { label: "Celos recientes", value: indicadores.celos_recientes },
+        { label: "Listos para destete", value: indicadores.listos_destete },
       ]
     : [];
 
@@ -162,17 +136,13 @@ export default function Dashboard({ isAuthenticated }: DashboardProps) {
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setTab(newValue);
-
-    const tabRoutes = [
-      "/dashboard",
-      "/reportes",
-    ];
-
+    const tabRoutes = ["/dashboard", "/reportes"];
     navigate(tabRoutes[newValue]);
   };
 
   return (
-    <Box sx={{ display: "flex", minHeight: "100vh", background: "#f7f7f7" }}>
+    <Box sx={{ display: "flex" }}>
+      {/* Sidebar */}
       <Drawer
         variant="permanent"
         sx={{
@@ -181,251 +151,157 @@ export default function Dashboard({ isAuthenticated }: DashboardProps) {
           "& .MuiDrawer-paper": {
             width: SIDEBAR_WIDTH,
             boxSizing: "border-box",
-            background: "#1d3557",
+            bgcolor: "#0f172a",
             color: "#fff",
+            borderRight: "1px solid rgba(255,255,255,0.1)",
           },
         }}
       >
-        <Box sx={{ height: 64 }} />
-        <List sx={{ mt: 2 }}>
-          {menu.map((i) => (
+        <Box sx={{ p: 2 }}>
+          <Typography variant="h6" sx={{ color: "#169b62", fontWeight: "bold" }}>
+            AGNES
+          </Typography>
+          <Typography variant="caption" sx={{ color: "#94a3b8" }}>
+            Sistema Granja Porcina
+          </Typography>
+        </Box>
+        <List sx={{ px: 1 }}>
+          {menu.map((item) => (
             <ListItemButton
-              key={i.text}
-              onClick={() => navigate(i.path)}
+              key={item.text}
+              onClick={() => navigate(item.path)}
               sx={{
-                color: window.location.pathname === i.path ? "#169b62" : "#fff",
+                color: window.location.pathname === item.path ? "#169b62" : "#fff",
                 background:
-                  window.location.pathname === i.path
-                    ? "rgba(22, 155, 98, 0.09)"
-                    : "none",
+                  window.location.pathname === item.path ? "rgba(22, 155, 98, 0.09)" : "none",
+                borderRadius: 1,
+                mb: 0.5,
               }}
             >
-              <ListItemIcon sx={{ color: "#169b62" }}>{i.icon}</ListItemIcon>
-              <ListItemText primary={i.text} />
+              <ListItemIcon sx={{ color: "inherit", minWidth: 40 }}>{item.icon}</ListItemIcon>
+              <ListItemText primary={item.text} />
             </ListItemButton>
           ))}
         </List>
       </Drawer>
 
-      <Box sx={{ flexGrow: 1, pt: 10, pl: 0, pr: 0 }}>
-        <Box sx={{ background: "#fff", pt: 3, pb: 1, px: 4 }}>
-          <Typography variant="h5" sx={{ fontWeight: 700 }}>
+      {/* Main content */}
+      <Box
+        sx={{
+          flexGrow: 1,
+          p: 3,
+          bgcolor: "#f8fafc",
+          minHeight: "100vh",
+        }}
+      >
+        <Box sx={{ mb: 2 }}>
+          <Typography variant="h5" sx={{ fontWeight: "bold", color: "#0f172a" }}>
             Dashboard sanitario-zoosanitario
           </Typography>
-          <Tabs
-            value={tab}
-            onChange={handleTabChange}
-            textColor="primary"
-            indicatorColor="primary"
-            sx={{ minHeight: 48 }}
-          >
-            <Tab label="VISIÓN GENERAL" />
-            <Tab label="ANÁLISIS" />
+          <Tabs value={tab} onChange={handleTabChange} sx={{ mt: 2 }}>
+            <Tab label="Visión General" />
+            <Tab label="Análisis" />
           </Tabs>
         </Box>
 
         {tab === 0 && (
           <>
-            <Stack
-              direction="row"
-              spacing={2}
-              sx={{ px: 4, py: 3, flexWrap: "wrap", gap: 2 }}
-            >
-              {indicatorStats.map((stat) => (
-                <Tooltip key={stat.label} title={stat.tooltip} arrow>
-                  <Card
-                    sx={{
-                      background: stat.color,
-                      minWidth: 180,
-                      minHeight: 110,
-                      mb: 2,
-                      cursor: "pointer",
-                      borderRadius: 3,
-                      boxShadow: 1,
-                    }}
-                  >
+            {/* Cards de indicadores */}
+            <Grid container spacing={2} sx={{ mb: 3 }}>
+              {indicatorStats.map((stat, idx) => (
+                <Grid size={{ xs: 12, sm: 6, md: 3 }} key={idx}>
+                  <Card sx={{ bgcolor: "#fff", boxShadow: "0 1px 3px rgba(0,0,0,0.1)" }}>
                     <CardContent>
-                      <Box
-                        sx={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 1.2,
-                        }}
-                      >
-                        {stat.icon}
-                        <Typography sx={{ fontSize: 15, fontWeight: 700 }}>
-                          {stat.label}
-                        </Typography>
-                      </Box>
-                      <Typography
-                        variant="h4"
-                        sx={{ color: "#27632a", fontWeight: 700 }}
-                      >
-                        {stat.value}
-                      </Typography>
+                      <Stack direction="row" spacing={1} alignItems="center">
+                        <Box sx={{ color: "#169b62" }}>{getStatIcon(stat.label)}</Box>
+                        <Box>
+                          <Typography variant="body2" sx={{ color: "#64748b" }}>
+                            {stat.label}
+                          </Typography>
+                          <Typography variant="h5" sx={{ fontWeight: "bold", color: "#0f172a" }}>
+                            {stat.value ?? 0}
+                          </Typography>
+                        </Box>
+                      </Stack>
                     </CardContent>
                   </Card>
-                </Tooltip>
+                </Grid>
               ))}
-            </Stack>
+            </Grid>
 
-            <Box
-              sx={{
-                px: 4,
-                pb: 4,
-                display: "flex",
-                gap: 2,
-                flexWrap: "wrap",
-                alignItems: "stretch",
-              }}
-            >
-              <Card
-                sx={{
-                  flex: 2,
-                  minWidth: 300,
-                  minHeight: 300,
-                  display: "flex",
-                }}
-              >
-                <CardContent sx={{ width: "100%" }}>
-                  <Typography
-                    variant="h6"
-                    sx={{ fontWeight: "bold", mb: 2 }}
-                  >
-                    <BarChartIcon color="success" sx={{ mr: 1 }} />
-                    Resumen reproductivo
-                  </Typography>
-                  {resumenReproductivo.length > 0 ? (
-                    <Box sx={{ width: "100%", height: 250 }}>
-                      <ResponsiveContainer width="100%" height="100%">
-                        <LineChart
-                          data={resumenReproductivo}
-                          margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
-                        >
-                          <CartesianGrid
-                            strokeDasharray="3 3"
-                            stroke="#e0e0e0"
-                          />
-                          <XAxis dataKey="mes" />
-                          <YAxis />
-                          <RechartsTooltip />
-                          <Legend />
-                          <Line
-                            type="monotone"
-                            dataKey="partos"
-                            name="Partos"
-                            stroke="#169b62"
-                            strokeWidth={2}
-                            dot={{ r: 3 }}
-                          />
-                          <Line
-                            type="monotone"
-                            dataKey="fallos"
-                            name="Fallos"
-                            stroke="#ff6b6b"
-                            strokeWidth={2}
-                            dot={{ r: 3 }}
-                          />
-                          <Line
-                            type="monotone"
-                            dataKey="mortalidad"
-                            name="Mortalidad"
-                            stroke="#ffa94d"
-                            strokeWidth={2}
-                            dot={{ r: 3 }}
-                          />
-                          <Line
-                            type="monotone"
-                            dataKey="destetes"
-                            name="Destetes"
-                            stroke="#4dabf7"
-                            strokeWidth={2}
-                            dot={{ r: 3 }}
-                          />
-                        </LineChart>
-                      </ResponsiveContainer>
-                    </Box>
-                  ) : (
-                    <Typography variant="body2" sx={{ color: "#666" }}>
-                      Sin datos de resumen reproductivo
+            {/* Resumen reproductivo */}
+            <Grid container spacing={3} sx={{ mb: 3 }}>
+              <Grid size={{ xs: 12, md: 6 }}>
+                <Card sx={{ bgcolor: "#fff", boxShadow: "0 1px 3px rgba(0,0,0,0.1)" }}>
+                  <CardContent>
+                    <Typography variant="h6" sx={{ mb: 2, fontWeight: "bold" }}>
+                      Resumen reproductivo
                     </Typography>
-                  )}
-                </CardContent>
-              </Card>
+                    {resumenReproductivo.length > 0 ? (
+                      resumenReproductivo.map((r, i) => (
+                        <Box key={i} sx={{ py: 1, borderBottom: i < resumenReproductivo.length - 1 ? "1px solid #e2e8f0" : "none" }}>
+                          <Typography variant="body1">{r.lote || "Sin lote"}</Typography>
+                          <Typography variant="body2" sx={{ color: "#64748b" }}>
+                            {r.evento} - {r.fecha}
+                          </Typography>
+                        </Box>
+                      ))
+                    ) : (
+                      <Typography sx={{ color: "#94a3b8" }}>Sin datos de resumen reproductivo</Typography>
+                    )}
+                  </CardContent>
+                </Card>
+              </Grid>
 
-              <Card
-                sx={{
-                  flex: 1,
-                  minWidth: 240,
-                  minHeight: 300,
-                  display: "flex",
-                }}
-              >
-                <CardContent sx={{ width: "100%" }}>
-                  <Typography
-                    variant="h6"
-                    sx={{ fontWeight: "bold", mb: 2 }}
-                  >
-                    <EventIcon color="primary" sx={{ mr: 1 }} />
-                    Próximos eventos y tareas
-                  </Typography>
-                  {eventos.length > 0 ? (
-                    <Box sx={{ maxHeight: 250, overflowY: "auto" }}>
-                      {eventos.slice(0, 5).map((evento) => (
-                        <Typography
-                          key={evento.id}
-                          variant="body2"
-                          sx={{
-                            mb: 1,
-                            pb: 1,
-                            borderBottom: "1px solid #eee",
-                          }}
-                        >
-                          <strong>{evento.tipo}:</strong> {evento.descripcion} (
-                          {evento.cantidad}) -{" "}
-                          {new Date(
-                            evento.fecha_evento
-                          ).toLocaleDateString()}
-                        </Typography>
-                      ))}
-                    </Box>
-                  ) : (
-                    <Typography variant="body2" sx={{ color: "#666" }}>
-                      Sin eventos próximos
+              {/* Eventos próximos */}
+              <Grid size={{ xs: 12, md: 6 }}>
+                <Card sx={{ bgcolor: "#fff", boxShadow: "0 1px 3px rgba(0,0,0,0.1)" }}>
+                  <CardContent>
+                    <Typography variant="h6" sx={{ mb: 2, fontWeight: "bold" }}>
+                      Próximos eventos y tareas
                     </Typography>
-                  )}
-                </CardContent>
-              </Card>
-            </Box>
+                    {eventos.length > 0 ? (
+                      eventos.slice(0, 5).map((evento, i) => (
+                        <Box key={i} sx={{ py: 1, borderBottom: i < eventos.length - 1 ? "1px solid #e2e8f0" : "none" }}>
+                          <Typography variant="body1">
+                            <strong>{evento.tipo}:</strong> {evento.descripcion} ({evento.cantidad})
+                          </Typography>
+                          <Typography variant="body2" sx={{ color: "#64748b" }}>
+                            {new Date(evento.fecha_evento).toLocaleDateString()}
+                          </Typography>
+                        </Box>
+                      ))
+                    ) : (
+                      <Typography sx={{ color: "#94a3b8" }}>Sin eventos próximos</Typography>
+                    )}
+                  </CardContent>
+                </Card>
+              </Grid>
+            </Grid>
           </>
         )}
 
         {tab === 1 && (
-          <Box sx={{ px: 4, py: 3 }}>
-            <Typography variant="h6">ANÁLISIS DETALLADO</Typography>
-            <Typography variant="body2" sx={{ color: "#666", mt: 2 }}>
-              Indicadores, Historial y Reportes disponibles en la sección de
-              Análisis...
-            </Typography>
-          </Box>
+          <Card sx={{ bgcolor: "#fff", boxShadow: "0 1px 3px rgba(0,0,0,0.1)" }}>
+            <CardContent>
+              <Typography variant="h6" sx={{ mb: 2, fontWeight: "bold" }}>
+                ANÁLISIS DETALLADO
+              </Typography>
+              <Typography sx={{ color: "#64748b" }}>
+                Indicadores, Historial y Reportes disponibles en la sección de Análisis...
+              </Typography>
+            </CardContent>
+          </Card>
+        )}
+
+        {uiAlert && (
+          <Snackbar open autoHideDuration={5000} onClose={handleCloseSnackbar} anchorOrigin={{ vertical: "top", horizontal: "right" }}>
+            <MuiAlert severity={uiAlert.type} onClose={handleCloseSnackbar}>
+              {uiAlert.msg}
+            </MuiAlert>
+          </Snackbar>
         )}
       </Box>
-
-      <Snackbar
-        open={!!uiAlert}
-        autoHideDuration={3200}
-        onClose={handleCloseSnackbar}
-      >
-        {uiAlert ? (
-          <MuiAlert
-            onClose={handleCloseSnackbar}
-            severity={uiAlert.type}
-            sx={{ width: "100%" }}
-          >
-            {uiAlert.msg}
-          </MuiAlert>
-        ) : undefined}
-      </Snackbar>
     </Box>
   );
 }
