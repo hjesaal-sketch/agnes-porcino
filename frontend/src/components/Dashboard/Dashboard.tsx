@@ -283,8 +283,7 @@ export default function Dashboard({ isAuthenticated }: DashboardProps) {
                 display: "flex",
                 gap: 2,
                 flexWrap: "wrap",
-              }}
-            >
+</Box>            >
               {/* Gráfica de Resumen Reproductivo */}
               <Card sx={{ flex: 2, minWidth: 300, minHeight: 300 }}>
                 <CardContent>
@@ -296,8 +295,7 @@ export default function Dashboard({ isAuthenticated }: DashboardProps) {
                     Resumen reproductivo
                   </Typography>
                   {resumenReproductivo.length > 0 ? (
-                    <Box sx={{ width: "100%", height: 250 }}>
-                      <ResponsiveContainer width="100%" height="100%">
+<div style={{ width: "100%", height: 250 }}>                      <ResponsiveContainer width="100%" height="100%">
                         <LineChart
                           data={resumenReproductivo}
                           margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
@@ -344,7 +342,7 @@ export default function Dashboard({ isAuthenticated }: DashboardProps) {
                           />
                         </LineChart>
                       </ResponsiveContainer>
-                    </Box>
+                    </div>
                   ) : (
                     <Typography variant="body2" sx={{ color: "#666" }}>
                       Sin datos de resumen reproductivo
@@ -382,7 +380,7 @@ export default function Dashboard({ isAuthenticated }: DashboardProps) {
                           ).toLocaleDateString()}
                         </Typography>
                       ))}
-                    </Box>
+                    </div>
                   ) : (
                     <Typography variant="body2" sx={{ color: "#666" }}>
                       Sin eventos próximos
