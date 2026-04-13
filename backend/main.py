@@ -98,6 +98,9 @@ from backend.api.Usuarios import router as usuarios_router
 from backend.api.Dashboard import router as dashboard_router
 from backend.api.condicion_corporal import Backfat as BackfatRouter
 
+# Configure the SQLAlchemy registry to resolve relationships
+Base.registry.configure()
+
 # Creación de la app FastAPI
 app = FastAPI(
     title="Gestión de Granjas",
