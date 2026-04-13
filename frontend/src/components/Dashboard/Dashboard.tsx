@@ -284,6 +284,7 @@ export default function Dashboard({ isAuthenticated }: DashboardProps) {
                 gap: 2,
                 flexWrap: "wrap",
 }}
+              >
               {/* Gráfica de Resumen Reproductivo */}
               <Card sx={{ flex: 2, minWidth: 300, minHeight: 300 }}>
                 <CardContent>
