@@ -16,7 +16,7 @@ import {
   Stack,
   Snackbar,
   Alert as MuiAlert,
-  Grid,
+  GridLegacy as Grid,
   Paper,
   CircularProgress,
 } from "@mui/material";
