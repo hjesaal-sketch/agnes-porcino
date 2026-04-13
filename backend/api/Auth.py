@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from pydantic import BaseModel
 from backend.database import get_db
 from backend.models.user import User
-import bcrypt
+from backend.utils.security import verify_password
 
 router = APIRouter()
 
@@ -18,7 +18,7 @@ async def login(request: LoginRequest, db: Session = Depends(get_db)):
     if not usuario:
         raise HTTPException(status_code=401, detail="Usuario o contraseña inválidos")
     
-    if not bcrypt.checkpw(request.password.encode('utf-8'), usuario.password.encode('utf-8')):
+    if not verify_password(request.password, usuario.hashed_password):
         raise HTTPException(status_code=401, detail="Usuario o contraseña inválidos")
     
     return {
