@@ -6,22 +6,48 @@ from backend.models.Dashboard import (
     DashboardEventoTarea,
     DashboardResumenReproductivo,
 )
+from backend.models.core.granjas import Granja  # Crear granja demo si no existe
+from backend.models.core.Empresas import Empresa
 
 def seed_dashboard(db: Session):
     """Crea datos de prueba para el dashboard si no existen"""
-    # Verificar si ya existen
+    # Crear empresa y granja demo si no existen (para que el seed del dashboard tenga FK válidas)
+    empresa = db.query(Empresa).filter_by(nombre="Empresa Demo").first()
+    if not empresa:
+        empresa = Empresa(nombre="Empresa Demo")
+        db.add(empresa)
+        db.commit()
+        db.refresh(empresa)
+
+    granja = db.query(Granja).filter_by(nombre="Granja Demo").first()
+    if not granja:
+        granja = Granja(
+            empresa_id=empresa.id,
+            nombre="Granja Demo",
+            ubicacion="Ubicación por defecto",
+        )
+        db.add(granja)
+        db.commit()
+        db.refresh(granja)
+
+    empresa_id = empresa.id
+    granja_id = granja.id
+
+    # Verificar si ya existen datos del dashboard
     existing = db.query(DashboardIndicador).filter(
-        DashboardIndicador.empresa_id == 1,
-        DashboardIndicador.granja_id == 1,
+        DashboardIndicador.empresa_id == empresa_id,
+        DashboardIndicador.granja_id == granja_id,
     ).first()
-    
+
     if existing:
-        return  # Ya existen datos
+        return  # Ya existen datosn  
+
+
     
     # Indicadores
     indicador = DashboardIndicador(
-        empresa_id=1,
-        granja_id=1,
+        empresa_id=empresa_id,
+        granja_id=granja_id,
         proximos_partos=4,
         fallos_reproductivos=2,
         mortalidad=1,
@@ -36,8 +62,8 @@ def seed_dashboard(db: Session):
     hoy = datetime.utcnow()
     eventos = [
         DashboardEventoTarea(
-            empresa_id=1,
-            granja_id=1,
+            empresa_id=empresa_id,
+            granja_id=granja_id,
             tipo="destete",
             descripcion="Destete lote A-12",
             cantidad=3,
@@ -45,8 +71,8 @@ def seed_dashboard(db: Session):
             completado=False,
         ),
         DashboardEventoTarea(
-            empresa_id=1,
-            granja_id=1,
+            empresa_id=empresa_id,
+            granja_id=granja_id,
             tipo="vacunacion",
             descripcion="Vacunación lechones",
             cantidad=4,
@@ -54,8 +80,8 @@ def seed_dashboard(db: Session):
             completado=False,
         ),
         DashboardEventoTarea(
-            empresa_id=1,
-            granja_id=1,
+            empresa_id=empresa_id,
+            granja_id=granja_id,
             tipo="parto",
             descripcion="Hembras a parto",
             cantidad=2,
@@ -69,8 +95,8 @@ def seed_dashboard(db: Session):
     meses = ["Septiembre", "Octubre", "Noviembre", "Diciembre", "Enero", "Febrero"]
     resumenes = [
         DashboardResumenReproductivo(
-            empresa_id=1,
-            granja_id=1,
+            empresa_id=empresa_id,
+            granja_id=granja_id,
             mes=mes,
             partos=45 + i * 3,
             fallos=8 - i,
