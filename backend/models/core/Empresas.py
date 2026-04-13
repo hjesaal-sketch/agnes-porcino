@@ -1,4 +1,5 @@
 # backend/models/core/Empresas.py
+from __future__ import annotations
 
 from datetime import datetime
 from typing import Optional, List
