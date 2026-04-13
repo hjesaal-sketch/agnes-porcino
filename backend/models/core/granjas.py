@@ -7,8 +7,7 @@ from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 from backend.database import Base
 
-if TYPE_CHECKING:
-    from backend.models.core.Empresas import Empresa
+    
 
 
 class Granja(Base):
@@ -28,4 +27,3 @@ class Granja(Base):
         onupdate=datetime.utcnow,
     )
 
-    empresa = relationship("Empresa", back_populates="granjas")
