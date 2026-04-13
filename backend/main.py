@@ -5,7 +5,7 @@ import logging
 
 from backend.database import engine, Base
 from backend.models.user import User
-import backend.models.core.granjas  # importa y registra Granja + modelos con FK
+from backend.models.core.granjas import Granja  # importa Granja explícitamente
 from backend.models.core.Empresas import Empresa  # modelo completo con relación granjas
 from backend.utils.security import get_password_hash
 from backend.seeds.dashboard_seed import seed_dashboard
