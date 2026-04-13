@@ -283,11 +283,19 @@ export default function Dashboard({ isAuthenticated }: DashboardProps) {
                 display: "flex",
                 gap: 2,
                 flexWrap: "wrap",
-}}
-              >
+                alignItems: "stretch",
+              }}
+            >
               {/* Gráfica de Resumen Reproductivo */}
-              <Card sx={{ flex: 2, minWidth: 300, minHeight: 300 }}>
-                <CardContent>
+              <Card
+                sx={{
+                  flex: 2,
+                  minWidth: 300,
+                  minHeight: 300,
+                  display: "flex",
+                }}
+              >
+                <CardContent sx={{ width: "100%" }}>
                   <Typography
                     variant="h6"
                     sx={{ fontWeight: "bold", mb: 2 }}
@@ -296,7 +304,8 @@ export default function Dashboard({ isAuthenticated }: DashboardProps) {
                     Resumen reproductivo
                   </Typography>
                   {resumenReproductivo.length > 0 ? (
-<div style={{ width: "100%", height: 250 }}>                      <ResponsiveContainer width="100%" height="100%">
+                    <Box sx={{ width: "100%", height: 250 }}>
+                      <ResponsiveContainer width="100%" height="100%">
                         <LineChart
                           data={resumenReproductivo}
                           margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
@@ -343,7 +352,7 @@ export default function Dashboard({ isAuthenticated }: DashboardProps) {
                           />
                         </LineChart>
                       </ResponsiveContainer>
-                    </div>
+                    </Box>
                   ) : (
                     <Typography variant="body2" sx={{ color: "#666" }}>
                       Sin datos de resumen reproductivo
@@ -352,6 +361,54 @@ export default function Dashboard({ isAuthenticated }: DashboardProps) {
                 </CardContent>
               </Card>
 
+              {/* Próximos eventos y tareas */}
+              <Card
+                sx={{
+                  flex: 1,
+                  minWidth: 240,
+                  minHeight: 300,
+                  display: "flex",
+                }}
+              >
+                <CardContent sx={{ width: "100%" }}>
+                  <Typography
+                    variant="h6"
+                    sx={{ fontWeight: "bold", mb: 2 }}
+                  >
+                    <EventIcon color="primary" sx={{ mr: 1 }} />
+                    Próximos eventos y tareas
+                  </Typography>
+                  {eventos.length > 0 ? (
+                    <Box sx={{ maxHeight: 250, overflowY: "auto" }}>
+                      {eventos.slice(0, 5).map((evento) => (
+                        <Typography
+                          key={evento.id}
+                          variant="body2"
+                          sx={{
+                            mb: 1,
+                            pb: 1,
+                            borderBottom: "1px solid #eee",
+                          }}
+                        >
+                          <strong>{evento.tipo}:</strong> {evento.descripcion} (
+                          {evento.cantidad}) -{" "}
+                          {new Date(
+                            evento.fecha_evento
+                          ).toLocaleDateString()}
+                        </Typography>
+                      ))}
+                    </Box>
+                  ) : (
+                    <Typography variant="body2" sx={{ color: "#666" }}>
+                      Sin eventos próximos
+                    </Typography>
+                  )}
+                </CardContent>
+              </Card>
+            </Box>
+          </>
+        )}
+        
               {/* Próximos eventos y tareas */}
               <Card sx={{ flex: 1, minWidth: 240, minHeight: 300 }}>
                 <CardContent>
