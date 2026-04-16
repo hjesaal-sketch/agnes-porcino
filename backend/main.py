@@ -118,12 +118,11 @@ origins = [
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
-    allow_origin_regex=r"https://agnes-porcino(-git-main-[a-z0-9-]+)?\.vercel\.app",
+    allow_origin_regex=r"https://agnes-porcino(-[a-z0-9-]+)?\.vercel\.app",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
 # Logs básicos
 logging.basicConfig(
     level=logging.INFO,
