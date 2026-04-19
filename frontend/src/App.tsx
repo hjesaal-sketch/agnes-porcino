@@ -8,16 +8,13 @@ import {
   useNavigate,
 } from "react-router-dom";
 
-// COMPONENTES GLOBALES
 import Navbar from "./components/Navbar/Navbar";
 import LoginForm from "./components/Forms/LoginForm";
 import Dashboard from "./components/Dashboard/Dashboard";
-import { login as apiLogin } from "./services/api";// VISTAS PRINCIPALES, warmupBackend } from "./services/api";// VISTAS PRINCIPALES
+import { login as apiLogin } from "./services/api";
 import Estadisticas from "./pages/Estadisticas/Estadisticas";
 import Productividad from "./pages/Productividad/Productividad";
 import Usuarios from "./pages/Usuarios/Usuarios";
-
-// MÓDULOS PRINCIPALES QUE SÍ EXISTEN
 import Gestacion from "./pages/Gestacion/Gestacion";
 import Maternidad from "./pages/Maternidad/Maternidad";
 import Insumos from "./pages/Insumos/Insumos";
@@ -27,7 +24,7 @@ import Reportes from "./pages/Reportes/Reportes";
 import Genetica from "./pages/Genetica/Genetica";
 import Sitio2 from "./pages/Sitio2/Sitio2";
 import Sitio3 from "./pages/Sitio3/Sitio3";
-import Animales from "./pages/Animales/Animales"; // NUEVO
+import Animales from "./pages/Animales/Animales";
 
 type UserType = {
   id: number;
@@ -37,20 +34,33 @@ type UserType = {
   empresa_id: number;
 };
 
-async function login(email: string, password: string) {
-  return apiLogin(email, password);
-}
 function saveSession(token: string, user: UserType) {
   localStorage.setItem("token", token);
   localStorage.setItem("user", JSON.stringify(user));
 }
+
 function clearSession() {
   localStorage.removeItem("token");
   localStorage.removeItem("user");
 }
+
 function getUserFromStorage(): UserType | null {
   const raw = localStorage.getItem("user");
-  return raw ? JSON.parse(raw) : null;
+
+  if (!raw || raw === "undefined" || raw === "null") {
+    return null;
+  }
+
+  try {
+    return JSON.parse(raw);
+  } catch {
+    localStorage.removeItem("user");
+    return null;
+  }
+}
+
+function hasToken(): boolean {
+  return !!localStorage.getItem("token");
 }
 
 function AppRoutes() {
@@ -59,38 +69,46 @@ function AppRoutes() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!user) {
-      const savedUser = getUserFromStorage();
-      if (savedUser) setUser(savedUser);
+    const savedUser = getUserFromStorage();
+    const authenticated = hasToken();
+
+    if (authenticated && savedUser) {
+      setUser(savedUser);
+    } else if (!authenticated) {
+      clearSession();
+      setUser(null);
     }
-  }, [user]);
+  }, []);
 
   const handleLogin = async (email: string, password: string) => {
     setLoginError("");
+
     try {
-      const result = await login(email, password);
+      const result = await apiLogin(email, password);
+      saveSession(result.access_token, result.user);
       setUser(result.user);
-      saveSession(result.token, result.user);
       navigate("/dashboard");
     } catch (err: any) {
-      setLoginError(err.message);
+      setLoginError(err.message || "Error al iniciar sesión");
     }
   };
 
   const handleLogout = () => {
-    setUser(null);
     clearSession();
+    setUser(null);
     navigate("/login");
   };
 
+  const isAuthenticated = !!user && hasToken();
+
   return (
     <>
-      <Navbar isAuthenticated={!!user} onLogout={handleLogout} />
+      <Navbar isAuthenticated={isAuthenticated} onLogout={handleLogout} />
       <Routes>
         <Route
           path="/login"
           element={
-            !user ? (
+            !isAuthenticated ? (
               <LoginForm onLogin={handleLogin} errorMessage={loginError} />
             ) : (
               <Navigate to="/dashboard" />
@@ -101,73 +119,79 @@ function AppRoutes() {
         <Route
           path="/dashboard"
           element={
-            user ? <Dashboard isAuthenticated={!!user} /> : <Navigate to="/login" />
+            isAuthenticated ? (
+              <Dashboard isAuthenticated={isAuthenticated} />
+            ) : (
+              <Navigate to="/login" />
+            )
           }
         />
 
-        {/* Módulos principales */}
         <Route
           path="/gestacion"
-          element={user ? <Gestacion /> : <Navigate to="/login" />}
+          element={isAuthenticated ? <Gestacion /> : <Navigate to="/login" />}
         />
         <Route
           path="/maternidad"
-          element={user ? <Maternidad /> : <Navigate to="/login" />}
+          element={isAuthenticated ? <Maternidad /> : <Navigate to="/login" />}
         />
         <Route
           path="/insumos"
-          element={user ? <Insumos /> : <Navigate to="/login" />}
+          element={isAuthenticated ? <Insumos /> : <Navigate to="/login" />}
         />
         <Route
           path="/granja"
-          element={user ? <Granja /> : <Navigate to="/login" />}
+          element={isAuthenticated ? <Granja /> : <Navigate to="/login" />}
         />
         <Route
           path="/economico"
-          element={user ? <Economico /> : <Navigate to="/login" />}
+          element={isAuthenticated ? <Economico /> : <Navigate to="/login" />}
         />
         <Route
           path="/reportes"
-          element={user ? <Reportes /> : <Navigate to="/login" />}
+          element={isAuthenticated ? <Reportes /> : <Navigate to="/login" />}
         />
         <Route
           path="/genetica"
-          element={user ? <Genetica /> : <Navigate to="/login" />}
+          element={isAuthenticated ? <Genetica /> : <Navigate to="/login" />}
         />
         <Route
           path="/sitio2"
-          element={user ? <Sitio2 /> : <Navigate to="/login" />}
+          element={isAuthenticated ? <Sitio2 /> : <Navigate to="/login" />}
         />
         <Route
           path="/sitio3"
-          element={user ? <Sitio3 /> : <Navigate to="/login" />}
+          element={isAuthenticated ? <Sitio3 /> : <Navigate to="/login" />}
         />
         <Route
           path="/animales"
-          element={user ? <Animales /> : <Navigate to="/login" />}
+          element={isAuthenticated ? <Animales /> : <Navigate to="/login" />}
         />
-
-        {/* Vistas extra */}
         <Route
           path="/productividad"
-          element={user ? <Productividad /> : <Navigate to="/login" />}
+          element={isAuthenticated ? <Productividad /> : <Navigate to="/login" />}
         />
         <Route
           path="/estadisticas"
-          element={user ? <Estadisticas /> : <Navigate to="/login" />}
+          element={isAuthenticated ? <Estadisticas /> : <Navigate to="/login" />}
         />
         <Route
           path="/usuarios"
-          element={user ? <Usuarios /> : <Navigate to="/login" />}
+          element={isAuthenticated ? <Usuarios /> : <Navigate to="/login" />}
         />
 
         <Route
           path="/"
           element={
-            user ? <Navigate to="/dashboard" /> : <Navigate to="/login" />
+            isAuthenticated ? <Navigate to="/dashboard" /> : <Navigate to="/login" />
           }
         />
-        <Route path="*" element={<Navigate to="/dashboard" />} />
+        <Route
+          path="*"
+          element={
+            isAuthenticated ? <Navigate to="/dashboard" /> : <Navigate to="/login" />
+          }
+        />
       </Routes>
     </>
   );
