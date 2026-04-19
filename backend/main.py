@@ -2,6 +2,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import logging
+from dotenv import load_dotenv
+
+load_dotenv()
 
 from backend.database import engine, Base
 from backend.models.user import User
@@ -98,17 +101,14 @@ from backend.api.Usuarios import router as usuarios_router
 from backend.api.Dashboard import router as dashboard_router
 from backend.api.condicion_corporal import Backfat as BackfatRouter
 
-# Configure the SQLAlchemy registry to resolve relationships
 Base.registry.configure()
 
-# Creación de la app FastAPI
 app = FastAPI(
     title="Gestión de Granjas",
     description="Backend API para plataforma de administración y producción porcina.",
     version="1.0.0",
 )
 
-# CORS: permite al frontend consumir la API
 origins = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
@@ -123,16 +123,14 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-# Logs básicos
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
 )
 
-# Si aún no usas migraciones, asegura que las tablas existan
 Base.metadata.create_all(bind=engine)
 
-# Monta routers bajo el prefijo /api
 app.include_router(login_router, prefix="/api")
 app.include_router(gestacion_alertas_router, prefix="/api")
 app.include_router(gestacion_madres_router, prefix="/api")
@@ -219,24 +217,23 @@ app.include_router(usuarios_router, prefix="/api")
 app.include_router(dashboard_router, prefix="/api")
 app.include_router(BackfatRouter.router, prefix="/api")
 
+
 @app.on_event("startup")
 async def startup():
     """Ejecuta seed de datos al iniciar la aplicación"""
     db = SessionLocal()
     try:
-        # Crear las tablas si no existen
         Base.metadata.create_all(bind=engine)
-        
-        # Crear usuario admin y empresa demo si no existen
+
         empresa_nombre = "Empresa Demo"
-        
+
         empresa = db.query(Empresa).filter_by(nombre=empresa_nombre).first()
         if not empresa:
             empresa = Empresa(nombre=empresa_nombre)
             db.add(empresa)
             db.commit()
             db.refresh(empresa)
-        
+
         admin_email = "admin@empresa.com"
         admin = db.query(User).filter_by(email=admin_email).first()
         if not admin:
@@ -256,6 +253,7 @@ async def startup():
         print(f"❌ Error al ejecutar seed: {e}")
     finally:
         db.close()
+
 
 @app.get("/ping")
 def ping():
