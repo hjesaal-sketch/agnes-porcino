@@ -231,17 +231,16 @@ export default function Dashboard({ isAuthenticated }: DashboardProps) {
         }}
       >
         <Box sx={{ mb: 3 }}>
-          <Typography variant="h4" sx={{ fontWeight: 600, color: "#0e2e1f" }}>
+          <Typography variant="h4" sx={{ fontWeight: 700, color: "#0e2e1f" }}>
             Dashboard sanitario-zoosanitario
           </Typography>
-          <Typography color="text.secondary">Resumen general</Typography>
         </Box>
 
         <Tabs value={tab} onChange={handleTabChange} sx={{ mb: 3 }}>
-          <Tab label="Resumen" />
+          <Tab label="Visión general" />
           <Tab label="Análisis" />
         </Tabs>
-
+        
         {tab === 0 && (
           <>
             <Grid container spacing={2} sx={{ mb: 3 }}>
