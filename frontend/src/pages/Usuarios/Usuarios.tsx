@@ -1,4 +1,4 @@
-//src/pages/Usuarios/Usuarios.tsx
+// frontend/src/pages/Usuarios/Usuarios.tsx
 import React, { useEffect, useState } from "react";
 import {
   Box,
@@ -121,17 +121,6 @@ export default function Usuarios() {
       return;
     }
 
-    const empresaIdGuardado = localStorage.getItem("empresa_id");
-    const empresa_id = empresaIdGuardado ? Number(empresaIdGuardado) : null;
-
-    if (!editId && !empresa_id) {
-      setUiAlert({
-        msg: "No se encontró la empresa del usuario actual. Debes iniciar sesión nuevamente.",
-        type: "error",
-      });
-      return;
-    }
-
     try {
       if (editId) {
         const actualizado = await updateUsuario(editId, {
@@ -147,6 +136,26 @@ export default function Usuarios() {
           type: "success",
         });
       } else {
+        const empresaIdGuardado = localStorage.getItem("empresa_id");
+
+        if (!empresaIdGuardado) {
+          setUiAlert({
+            msg: "No se encontró la empresa del usuario actual. Debes iniciar sesión nuevamente.",
+            type: "error",
+          });
+          return;
+        }
+
+        const empresa_id = Number(empresaIdGuardado);
+
+        if (Number.isNaN(empresa_id)) {
+          setUiAlert({
+            msg: "El identificador de empresa es inválido. Debes iniciar sesión nuevamente.",
+            type: "error",
+          });
+          return;
+        }
+
         const nuevo = await createUsuario({
           nombre: form.nombre,
           email: form.email,
@@ -154,12 +163,14 @@ export default function Usuarios() {
           activo: form.activo,
           empresa_id,
         });
+
         setUsuarios((prev) => [nuevo, ...prev]);
         setUiAlert({
           msg: "Usuario creado correctamente",
           type: "success",
         });
       }
+
       setShowDialog(false);
       setEditId(null);
       limpiarForm();
@@ -244,6 +255,7 @@ export default function Usuarios() {
 
   return (
     <Box sx={{ display: "flex", minHeight: "100vh", background: "#f7f7f7" }}>
+      {/* SIDEBAR */}
       <Drawer
         variant="permanent"
         sx={{
@@ -279,6 +291,7 @@ export default function Usuarios() {
         </List>
       </Drawer>
 
+      {/* CONTENIDO PRINCIPAL */}
       <Box
         sx={{
           flexGrow: 1,
@@ -301,6 +314,7 @@ export default function Usuarios() {
                 Gestión de Usuarios
               </Typography>
 
+              {/* Resumen superior */}
               <Box
                 sx={{
                   display: "flex",
@@ -341,6 +355,7 @@ export default function Usuarios() {
                 Nuevo Usuario
               </Button>
 
+              {/* Tabla de usuarios */}
               <Box sx={{ width: "100%", overflowX: "auto" }}>
                 <table
                   style={{
@@ -454,6 +469,7 @@ export default function Usuarios() {
         </Box>
       </Box>
 
+      {/* Diálogo crear/editar */}
       <Dialog
         open={showDialog}
         onClose={() => {
