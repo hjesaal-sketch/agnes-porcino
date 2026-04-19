@@ -492,18 +492,22 @@ export default function Usuarios() {
           sx={{
             display: "flex",
             flexDirection: "column",
-            gap: 2.2,
-            pt: 1,
+            gap: 2,
+            pt: 3,
           }}
         >
-          <TextField
-            label="Nombre"
-            value={form.nombre}
-            onChange={(e) =>
-              setForm((f) => ({ ...f, nombre: e.target.value }))
-            }
-            fullWidth
-          />
+          <Box sx={{ mt: 0.5 }}>
+            <TextField
+              label="Nombre"
+              value={form.nombre}
+              onChange={(e) =>
+                setForm((f) => ({ ...f, nombre: e.target.value }))
+              }
+              fullWidth
+              variant="outlined"
+              size="medium"
+            />
+          </Box>
           <TextField
             label="Correo electrónico"
             type="email"
