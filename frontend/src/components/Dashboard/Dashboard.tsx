@@ -226,6 +226,7 @@ export default function Dashboard({ isAuthenticated }: DashboardProps) {
         sx={{
           flexGrow: 1,
           p: 3,
+          pt: 10,
           minHeight: "100vh",
           backgroundColor: "#f5f7f9",
         }}
