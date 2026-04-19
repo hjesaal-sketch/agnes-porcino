@@ -1,4 +1,4 @@
-// src/pages/Usuarios/Usuarios.tsx
+#src/pages/Usuarios/Usuarios.tsx
 import React, { useEffect, useState } from "react";
 import {
   Box,
@@ -34,7 +34,8 @@ import PeopleIcon from "@mui/icons-material/People";
 import { useNavigate } from "react-router-dom";
 import {
   getUsuarios,
-  createUsuario,  updateUsuario,
+  createUsuario,
+  updateUsuario,
   deleteUsuario,
   Usuario,
   RolUsuario,
@@ -120,6 +121,17 @@ export default function Usuarios() {
       return;
     }
 
+    const empresaIdGuardado = localStorage.getItem("empresa_id");
+    const empresa_id = empresaIdGuardado ? Number(empresaIdGuardado) : null;
+
+    if (!editId && !empresa_id) {
+      setUiAlert({
+        msg: "No se encontró la empresa del usuario actual. Debes iniciar sesión nuevamente.",
+        type: "error",
+      });
+      return;
+    }
+
     try {
       if (editId) {
         const actualizado = await updateUsuario(editId, {
@@ -140,6 +152,7 @@ export default function Usuarios() {
           email: form.email,
           rol: form.rol,
           activo: form.activo,
+          empresa_id,
         });
         setUsuarios((prev) => [nuevo, ...prev]);
         setUiAlert({
@@ -151,8 +164,28 @@ export default function Usuarios() {
       setEditId(null);
       limpiarForm();
     } catch (e: any) {
+      const detail = e?.response?.data?.detail;
+
+      let mensaje = "Error al guardar usuario";
+
+      if (Array.isArray(detail)) {
+        mensaje = detail
+          .map((item: any) => {
+            const campo = Array.isArray(item?.loc)
+              ? item.loc.join(".")
+              : "campo";
+            const texto = item?.msg || "Error de validación";
+            return `${campo}: ${texto}`;
+          })
+          .join(", ");
+      } else if (typeof detail === "string") {
+        mensaje = detail;
+      } else if (e?.message) {
+        mensaje = e.message;
+      }
+
       setUiAlert({
-        msg: e?.message || "Error al guardar usuario",
+        msg: mensaje,
         type: "error",
       });
     }
@@ -180,8 +213,28 @@ export default function Usuarios() {
         type: "success",
       });
     } catch (e: any) {
+      const detail = e?.response?.data?.detail;
+
+      let mensaje = "Error al eliminar usuario";
+
+      if (Array.isArray(detail)) {
+        mensaje = detail
+          .map((item: any) => {
+            const campo = Array.isArray(item?.loc)
+              ? item.loc.join(".")
+              : "campo";
+            const texto = item?.msg || "Error de validación";
+            return `${campo}: ${texto}`;
+          })
+          .join(", ");
+      } else if (typeof detail === "string") {
+        mensaje = detail;
+      } else if (e?.message) {
+        mensaje = e.message;
+      }
+
       setUiAlert({
-        msg: e?.message || "Error al eliminar usuario",
+        msg: mensaje,
         type: "error",
       });
     }
@@ -191,7 +244,6 @@ export default function Usuarios() {
 
   return (
     <Box sx={{ display: "flex", minHeight: "100vh", background: "#f7f7f7" }}>
-      {/* SIDEBAR */}
       <Drawer
         variant="permanent"
         sx={{
@@ -227,7 +279,6 @@ export default function Usuarios() {
         </List>
       </Drawer>
 
-      {/* CONTENIDO PRINCIPAL */}
       <Box
         sx={{
           flexGrow: 1,
@@ -250,7 +301,6 @@ export default function Usuarios() {
                 Gestión de Usuarios
               </Typography>
 
-              {/* Resumen superior */}
               <Box
                 sx={{
                   display: "flex",
@@ -291,7 +341,6 @@ export default function Usuarios() {
                 Nuevo Usuario
               </Button>
 
-              {/* Tabla de usuarios */}
               <Box sx={{ width: "100%", overflowX: "auto" }}>
                 <table
                   style={{
@@ -405,7 +454,6 @@ export default function Usuarios() {
         </Box>
       </Box>
 
-      {/* Diálogo crear/editar */}
       <Dialog
         open={showDialog}
         onClose={() => {
