@@ -1,4 +1,4 @@
-// frontend/src/services/Dashboard.ts
+#frontend/src/services/Dashboard.ts
 import API_BASE from "../config/api";
 import { getAuthHeaders } from "./api";
 
@@ -30,8 +30,9 @@ export type ResumenReproductivo = {
   id: number;
   empresa_id: number;
   granja_id: number;
-  mes: string;
+  fecha: string;
   partos: number;
+  nacidos: number;
   fallos: number;
   mortalidad: number;
   destetes: number;
@@ -73,11 +74,12 @@ function mapApiToResumen(api: any): ResumenReproductivo {
     id: api.id,
     empresa_id: api.empresa_id,
     granja_id: api.granja_id,
-    mes: api.mes,
-    partos: api.partos,
-    fallos: api.fallos,
-    mortalidad: api.mortalidad,
-    destetes: api.destetes,
+    fecha: api.fecha ?? api.mes ?? "",
+    partos: api.partos ?? 0,
+    nacidos: api.nacidos ?? api.destetes ?? 0,
+    fallos: api.fallos ?? 0,
+    mortalidad: api.mortalidad ?? 0,
+    destetes: api.destetes ?? 0,
   };
 }
 
