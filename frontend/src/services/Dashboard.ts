@@ -1,4 +1,4 @@
-#frontend/src/services/Dashboard.ts
+//frontend/src/services/Dashboard.ts
 import API_BASE from "../config/api";
 import { getAuthHeaders } from "./api";
 
