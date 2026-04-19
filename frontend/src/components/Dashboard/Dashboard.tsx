@@ -232,7 +232,7 @@ export default function Dashboard({ isAuthenticated }: DashboardProps) {
         }}
       >
         <Box sx={{ mb: 3 }}>
-          <Typography variant="h4" sx={{ fontWeight: 700, color: "#0e2e1f" }}>
+          <Typography variant="h5" sx={{ fontWeight: 700, color: "#0e2e1f" }}>
             Dashboard sanitario-zoosanitario
           </Typography>
         </Box>
