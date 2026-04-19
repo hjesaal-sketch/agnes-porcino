@@ -1,4 +1,4 @@
-//src/App.tsx
+// src/App.tsx
 import React, { useState, useEffect } from "react";
 import {
   BrowserRouter as Router,
@@ -37,11 +37,13 @@ type UserType = {
 function saveSession(token: string, user: UserType) {
   localStorage.setItem("token", token);
   localStorage.setItem("user", JSON.stringify(user));
+  localStorage.setItem("empresa_id", String(user.empresa_id));
 }
 
 function clearSession() {
   localStorage.removeItem("token");
   localStorage.removeItem("user");
+  localStorage.removeItem("empresa_id");
 }
 
 function getUserFromStorage(): UserType | null {
@@ -74,6 +76,7 @@ function AppRoutes() {
 
     if (authenticated && savedUser) {
       setUser(savedUser);
+      localStorage.setItem("empresa_id", String(savedUser.empresa_id));
     } else if (!authenticated) {
       clearSession();
       setUser(null);
