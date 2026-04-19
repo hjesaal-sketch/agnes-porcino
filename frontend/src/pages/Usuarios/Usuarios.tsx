@@ -479,16 +479,21 @@ export default function Usuarios() {
         }}
         maxWidth="sm"
         fullWidth
+        PaperProps={{
+          sx: {
+            pt: 1.5,
+          },
+        }}
       >
-        <DialogTitle>
+        <DialogTitle sx={{ pb: 1.5 }}>
           {editId ? "Editar Usuario" : "Nuevo Usuario"}
         </DialogTitle>
         <DialogContent
           sx={{
             display: "flex",
             flexDirection: "column",
-            gap: 2,
-            pt: 3,
+            gap: 2.2,
+            pt: 1,
           }}
         >
           <TextField
