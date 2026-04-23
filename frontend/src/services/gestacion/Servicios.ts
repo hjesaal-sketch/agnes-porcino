@@ -1,268 +1,129 @@
-//frontend/src/services/Dashboard.ts
-import API_BASE from "../config/api";
-import { getAuthHeaders } from "./api";
+// src/services/gestacion/Servicios.ts
 
-export type IndicadorStats = {
-  id: number;
-  empresa_id: number;
-  granja_id: number;
-  proximos_partos: number;
-  fallos_reproductivos: number;
-  mortalidad: number;
-  alimento_bajo: number;
-  medicamento_bajo: number;
-  celos_recientes: number;
-  listos_destete: number;
+import API_BASE from "../../config/api";
+
+export type SubServicioGestacion = {
+  numero: number;
+  fecha: string; // ISO (YYYY-MM-DD)
+  verracoId: string;
+  inseminador: string;
 };
 
-export type EventoTarea = {
-  id: number;
-  empresa_id: number;
-  granja_id: number;
-  tipo: string;
-  descripcion: string;
-  cantidad: number;
-  fecha_evento: string;
-  completado: boolean;
-};
-
-export type ResumenReproductivo = {
-  id: number;
-  empresa_id: number;
-  granja_id: number;
+export type ServicioGestacion = {
+  id: number; // ahora viene de la BD
   fecha: string;
-  partos: number;
-  nacidos: number;
-  fallos: number;
-  mortalidad: number;
-  destetes: number;
+  identificacionMadre: string;
+  tipoServicio: "Natural" | "Inseminación" | "Transferencia Embrionaria";
+  verracoId: string;
+  resultado: "Pendiente" | "Gestante" | "Vacía" | "Aborto";
+  observaciones: string;
+  subServicios: SubServicioGestacion[];
 };
 
-// Antes: const EMPRESA_ID = 1;
-// Ahora: se toma del localStorage, igual que en Usuarios.
-function getEmpresaId(): number {
-  const empresaIdGuardado = localStorage.getItem("empresa_id");
-
-  if (!empresaIdGuardado) {
-    throw new Error(
-      "No se encontró la empresa del usuario actual. Debes iniciar sesión nuevamente."
-    );
-  }
-
-  const empresa_id = Number(empresaIdGuardado);
-
-  if (Number.isNaN(empresa_id)) {
-    throw new Error(
-      "El identificador de empresa es inválido. Debes iniciar sesión nuevamente."
-    );
-  }
-
-  return empresa_id;
-}
-
-// Por ahora mantenemos granja fija en 1, como antes.
-// Si luego necesitas manejar múltiples granjas, lo hacemos en un paso aparte.
 const GRANJA_ID = 1;
 
-function mapApiToIndicador(api: any): IndicadorStats {
+function mapApiToServicio(api: any): ServicioGestacion {
   return {
     id: api.id,
-    empresa_id: api.empresa_id,
-    granja_id: api.granja_id,
-    proximos_partos: api.proximos_partos,
-    fallos_reproductivos: api.fallos_reproductivos,
-    mortalidad: api.mortalidad,
-    alimento_bajo: api.alimento_bajo,
-    medicamento_bajo: api.medicamento_bajo,
-    celos_recientes: api.celos_recientes,
-    listos_destete: api.listos_destete,
+    fecha: api.fecha,
+    identificacionMadre: api.identificacionMadre,
+    tipoServicio: api.tipoServicio,
+    verracoId: api.verracoId,
+    resultado: api.resultado,
+    observaciones: api.observaciones ?? "",
+    subServicios: (api.subServicios || []).map((ss: any) => ({
+      numero: ss.numero,
+      fecha: ss.fecha,
+      verracoId: ss.verracoId,
+      inseminador: ss.inseminador,
+    })),
   };
 }
 
-function mapApiToEvento(api: any): EventoTarea {
-  return {
-    id: api.id,
-    empresa_id: api.empresa_id,
-    granja_id: api.granja_id,
-    tipo: api.tipo,
-    descripcion: api.descripcion,
-    cantidad: api.cantidad,
-    fecha_evento: api.fecha_evento,
-    completado: api.completado,
-  };
-}
-
-function mapApiToResumen(api: any): ResumenReproductivo {
-  return {
-    id: api.id,
-    empresa_id: api.empresa_id,
-    granja_id: api.granja_id,
-    fecha: api.fecha ?? api.mes ?? "",
-    partos: api.partos ?? 0,
-    nacidos: api.nacidos ?? api.destetes ?? 0,
-    fallos: api.fallos ?? 0,
-    mortalidad: api.mortalidad ?? 0,
-    destetes: api.destetes ?? 0,
-  };
-}
-
-export async function getIndicadores(): Promise<IndicadorStats> {
-  const empresa_id = getEmpresaId();
-
-  const url = new URL(
-    `${API_BASE}/dashboard/indicadores`,
-    window.location.origin
-  );
-  url.searchParams.set("empresa_id", String(empresa_id));
-  url.searchParams.set("granja_id", String(GRANJA_ID));
-
-  const res = await fetch(url.toString(), {
-    headers: getAuthHeaders(),
-  });
-
-  if (!res.ok) {
-    throw new Error("Error al obtener indicadores");
-  }
-
-  const data = await res.json();
-  return mapApiToIndicador(data);
-}
-
-export async function getEventosTareas(
-  completado: boolean = false
-): Promise<EventoTarea[]> {
-  const empresa_id = getEmpresaId();
-
-  const url = new URL(
-    `${API_BASE}/dashboard/eventos-tareas`,
-    window.location.origin
-  );
-  url.searchParams.set("empresa_id", String(empresa_id));
-  url.searchParams.set("granja_id", String(GRANJA_ID));
-  url.searchParams.set("completado", String(completado));
-
-  const res = await fetch(url.toString(), {
-    headers: getAuthHeaders(),
-  });
-
-  if (!res.ok) {
-    throw new Error("Error al obtener eventos");
-  }
-
-  const data = await res.json();
-  return data.map(mapApiToEvento);
-}
-
-export async function getResumenReproductivo(): Promise<ResumenReproductivo[]> {
-  const empresa_id = getEmpresaId();
-
-  const url = new URL(
-    `${API_BASE}/dashboard/resumen-reproductivo`,
-    window.location.origin
-  );
-  url.searchParams.set("empresa_id", String(empresa_id));
-  url.searchParams.set("granja_id", String(GRANJA_ID));
-
-  const res = await fetch(url.toString(), {
-    headers: getAuthHeaders(),
-  });
-
-  if (!res.ok) {
-    throw new Error("Error al obtener resumen reproductivo");
-  }
-
-  const data = await res.json();
-  return data.map(mapApiToResumen);
-}
-
-export async function actualizarIndicadores(
-  payload: Omit<IndicadorStats, "id" | "empresa_id" | "granja_id">
-): Promise<IndicadorStats> {
-  const empresa_id = getEmpresaId();
-
-  const body = {
-    empresa_id,
-    granja_id: GRANJA_ID,
-    ...payload,
-  };
-
-  const res = await fetch(`${API_BASE}/dashboard/indicadores`, {
-    method: "POST",
-    headers: getAuthHeaders(),
-    body: JSON.stringify(body),
-  });
-
-  if (!res.ok) {
-    throw new Error("Error al actualizar indicadores");
-  }
-
-  const data = await res.json();
-  return mapApiToIndicador(data);
-}
-
-export async function crearEvento(
-  payload: Omit<EventoTarea, "id" | "empresa_id" | "granja_id">
-): Promise<EventoTarea> {
-  const empresa_id = getEmpresaId();
-
-  const body = {
-    empresa_id,
-    granja_id: GRANJA_ID,
-    ...payload,
-  };
-
-  const res = await fetch(`${API_BASE}/dashboard/eventos-tareas`, {
-    method: "POST",
-    headers: getAuthHeaders(),
-    body: JSON.stringify(body),
-  });
-
-  if (!res.ok) {
-    throw new Error("Error al crear evento");
-  }
-
-  const data = await res.json();
-  return mapApiToEvento(data);
-}
-
-export async function marcarEventoCompletado(id: number): Promise<EventoTarea> {
+// direction:
+//   - "desc" (default): más nuevos primero
+//   - "asc": más antiguos primero
+export async function getServicios(
+  direction: "asc" | "desc" = "desc"
+): Promise<ServicioGestacion[]> {
   const res = await fetch(
-    `${API_BASE}/dashboard/eventos-tareas/${id}/completar`,
+    `${API_BASE}/gestacion/servicios?granja_id=${GRANJA_ID}&direction=${direction}`
+  );
+  if (!res.ok) throw new Error("Error al obtener servicios");
+  const data = await res.json();
+  return data.map(mapApiToServicio);
+}
+
+export async function addServicio(
+  servicio: Omit<ServicioGestacion, "id">
+): Promise<ServicioGestacion> {
+  const payload = {
+    fecha: servicio.fecha,
+    identificacionMadre: servicio.identificacionMadre,
+    tipoServicio: servicio.tipoServicio,
+    verracoId: servicio.verracoId,
+    resultado: servicio.resultado,
+    observaciones: servicio.observaciones,
+    subServicios: servicio.subServicios.map((ss) => ({
+      numero: ss.numero,
+      fecha: ss.fecha,
+      verracoId: ss.verracoId,
+      inseminador: ss.inseminador,
+    })),
+  };
+
+  const res = await fetch(
+    `${API_BASE}/gestacion/servicios?granja_id=${GRANJA_ID}`,
     {
-      method: "PUT",
-      headers: getAuthHeaders(),
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
     }
   );
 
-  if (!res.ok) {
-    throw new Error("Error al completar evento");
-  }
-
+  if (!res.ok) throw new Error("Error al crear servicio");
   const data = await res.json();
-  return mapApiToEvento(data);
+  return mapApiToServicio(data);
 }
 
-export async function crearResumenReproductivo(
-  payload: Omit<ResumenReproductivo, "id" | "empresa_id" | "granja_id">
-): Promise<ResumenReproductivo> {
-  const empresa_id = getEmpresaId();
-
-  const body = {
-    empresa_id,
-    granja_id: GRANJA_ID,
-    ...payload,
+export async function updateServicio(
+  id: number,
+  servicio: Omit<ServicioGestacion, "id">
+): Promise<ServicioGestacion> {
+  const payload = {
+    fecha: servicio.fecha,
+    tipoServicio: servicio.tipoServicio,
+    verracoId: servicio.verracoId,
+    resultado: servicio.resultado,
+    observaciones: servicio.observaciones,
+    subServicios: servicio.subServicios.map((ss) => ({
+      numero: ss.numero,
+      fecha: ss.fecha,
+      verracoId: ss.verracoId,
+      inseminador: ss.inseminador,
+    })),
   };
 
-  const res = await fetch(`${API_BASE}/dashboard/resumen-reproductivo`, {
-    method: "POST",
-    headers: getAuthHeaders(),
-    body: JSON.stringify(body),
-  });
+  const res = await fetch(
+    `${API_BASE}/gestacion/servicios/${id}?granja_id=${GRANJA_ID}`,
+    {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    }
+  );
 
-  if (!res.ok) {
-    throw new Error("Error al crear resumen reproductivo");
-  }
-
+  if (!res.ok) throw new Error("Error al actualizar servicio");
   const data = await res.json();
-  return mapApiToResumen(data);
+  return mapApiToServicio(data);
+}
+
+export async function deleteServicio(id: number): Promise<void> {
+  const res = await fetch(
+    `${API_BASE}/gestacion/servicios/${id}?granja_id=${GRANJA_ID}`,
+    {
+      method: "DELETE",
+    }
+  );
+  if (!res.ok) throw new Error("Error al eliminar servicio");
 }
