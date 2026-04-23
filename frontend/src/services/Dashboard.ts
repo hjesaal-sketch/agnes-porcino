@@ -38,7 +38,30 @@ export type ResumenReproductivo = {
   destetes: number;
 };
 
-const EMPRESA_ID = 1;
+// Antes: const EMPRESA_ID = 1;
+// Ahora: se toma del localStorage, igual que en Usuarios.
+function getEmpresaId(): number {
+  const empresaIdGuardado = localStorage.getItem("empresa_id");
+
+  if (!empresaIdGuardado) {
+    throw new Error(
+      "No se encontró la empresa del usuario actual. Debes iniciar sesión nuevamente."
+    );
+  }
+
+  const empresa_id = Number(empresaIdGuardado);
+
+  if (Number.isNaN(empresa_id)) {
+    throw new Error(
+      "El identificador de empresa es inválido. Debes iniciar sesión nuevamente."
+    );
+  }
+
+  return empresa_id;
+}
+
+// Por ahora mantenemos granja fija en 1, como antes.
+// Si luego necesitas manejar múltiples granjas, lo hacemos en un paso aparte.
 const GRANJA_ID = 1;
 
 function mapApiToIndicador(api: any): IndicadorStats {
@@ -84,8 +107,13 @@ function mapApiToResumen(api: any): ResumenReproductivo {
 }
 
 export async function getIndicadores(): Promise<IndicadorStats> {
-  const url = new URL(`${API_BASE}/dashboard/indicadores`, window.location.origin);
-  url.searchParams.set("empresa_id", String(EMPRESA_ID));
+  const empresa_id = getEmpresaId();
+
+  const url = new URL(
+    `${API_BASE}/dashboard/indicadores`,
+    window.location.origin
+  );
+  url.searchParams.set("empresa_id", String(empresa_id));
   url.searchParams.set("granja_id", String(GRANJA_ID));
 
   const res = await fetch(url.toString(), {
@@ -103,11 +131,13 @@ export async function getIndicadores(): Promise<IndicadorStats> {
 export async function getEventosTareas(
   completado: boolean = false
 ): Promise<EventoTarea[]> {
+  const empresa_id = getEmpresaId();
+
   const url = new URL(
     `${API_BASE}/dashboard/eventos-tareas`,
     window.location.origin
   );
-  url.searchParams.set("empresa_id", String(EMPRESA_ID));
+  url.searchParams.set("empresa_id", String(empresa_id));
   url.searchParams.set("granja_id", String(GRANJA_ID));
   url.searchParams.set("completado", String(completado));
 
@@ -124,11 +154,13 @@ export async function getEventosTareas(
 }
 
 export async function getResumenReproductivo(): Promise<ResumenReproductivo[]> {
+  const empresa_id = getEmpresaId();
+
   const url = new URL(
     `${API_BASE}/dashboard/resumen-reproductivo`,
     window.location.origin
   );
-  url.searchParams.set("empresa_id", String(EMPRESA_ID));
+  url.searchParams.set("empresa_id", String(empresa_id));
   url.searchParams.set("granja_id", String(GRANJA_ID));
 
   const res = await fetch(url.toString(), {
@@ -146,8 +178,10 @@ export async function getResumenReproductivo(): Promise<ResumenReproductivo[]> {
 export async function actualizarIndicadores(
   payload: Omit<IndicadorStats, "id" | "empresa_id" | "granja_id">
 ): Promise<IndicadorStats> {
+  const empresa_id = getEmpresaId();
+
   const body = {
-    empresa_id: EMPRESA_ID,
+    empresa_id,
     granja_id: GRANJA_ID,
     ...payload,
   };
@@ -169,8 +203,10 @@ export async function actualizarIndicadores(
 export async function crearEvento(
   payload: Omit<EventoTarea, "id" | "empresa_id" | "granja_id">
 ): Promise<EventoTarea> {
+  const empresa_id = getEmpresaId();
+
   const body = {
-    empresa_id: EMPRESA_ID,
+    empresa_id,
     granja_id: GRANJA_ID,
     ...payload,
   };
@@ -190,10 +226,13 @@ export async function crearEvento(
 }
 
 export async function marcarEventoCompletado(id: number): Promise<EventoTarea> {
-  const res = await fetch(`${API_BASE}/dashboard/eventos-tareas/${id}/completar`, {
-    method: "PUT",
-    headers: getAuthHeaders(),
-  });
+  const res = await fetch(
+    `${API_BASE}/dashboard/eventos-tareas/${id}/completar`,
+    {
+      method: "PUT",
+      headers: getAuthHeaders(),
+    }
+  );
 
   if (!res.ok) {
     throw new Error("Error al completar evento");
@@ -206,8 +245,10 @@ export async function marcarEventoCompletado(id: number): Promise<EventoTarea> {
 export async function crearResumenReproductivo(
   payload: Omit<ResumenReproductivo, "id" | "empresa_id" | "granja_id">
 ): Promise<ResumenReproductivo> {
+  const empresa_id = getEmpresaId();
+
   const body = {
-    empresa_id: EMPRESA_ID,
+    empresa_id,
     granja_id: GRANJA_ID,
     ...payload,
   };
