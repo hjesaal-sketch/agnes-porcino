@@ -25,45 +25,13 @@ import Genetica from "./pages/Genetica/Genetica";
 import Sitio2 from "./pages/Sitio2/Sitio2";
 import Sitio3 from "./pages/Sitio3/Sitio3";
 import Animales from "./pages/Animales/Animales";
-
-type UserType = {
-  id: number;
-  nombre: string;
-  email: string;
-  role: string;
-  empresa_id: number;
-};
-
-function saveSession(token: string, user: UserType) {
-  localStorage.setItem("token", token);
-  localStorage.setItem("user", JSON.stringify(user));
-  localStorage.setItem("empresa_id", String(user.empresa_id));
-}
-
-function clearSession() {
-  localStorage.removeItem("token");
-  localStorage.removeItem("user");
-  localStorage.removeItem("empresa_id");
-}
-
-function getUserFromStorage(): UserType | null {
-  const raw = localStorage.getItem("user");
-
-  if (!raw || raw === "undefined" || raw === "null") {
-    return null;
-  }
-
-  try {
-    return JSON.parse(raw);
-  } catch {
-    localStorage.removeItem("user");
-    return null;
-  }
-}
-
-function hasToken(): boolean {
-  return !!localStorage.getItem("token");
-}
+import {
+  saveSession,
+  clearSession,
+  getUserFromStorage,
+  hasToken,
+  UserType,
+} from "./services/session";
 
 function AppRoutes() {
   const [user, setUser] = useState<UserType | null>(getUserFromStorage());
@@ -172,11 +140,15 @@ function AppRoutes() {
         />
         <Route
           path="/productividad"
-          element={isAuthenticated ? <Productividad /> : <Navigate to="/login" />}
+          element={
+            isAuthenticated ? <Productividad /> : <Navigate to="/login" />
+          }
         />
         <Route
           path="/estadisticas"
-          element={isAuthenticated ? <Estadisticas /> : <Navigate to="/login" />}
+          element={
+            isAuthenticated ? <Estadisticas /> : <Navigate to="/login" />
+          }
         />
         <Route
           path="/usuarios"
@@ -186,13 +158,21 @@ function AppRoutes() {
         <Route
           path="/"
           element={
-            isAuthenticated ? <Navigate to="/dashboard" /> : <Navigate to="/login" />
+            isAuthenticated ? (
+              <Navigate to="/dashboard" />
+            ) : (
+              <Navigate to="/login" />
+            )
           }
         />
         <Route
           path="*"
           element={
-            isAuthenticated ? <Navigate to="/dashboard" /> : <Navigate to="/login" />
+            isAuthenticated ? (
+              <Navigate to="/dashboard" />
+            ) : (
+              <Navigate to="/login" />
+            )
           }
         />
       </Routes>
