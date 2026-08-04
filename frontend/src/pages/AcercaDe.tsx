@@ -48,7 +48,7 @@ export default function AcercaDe() {
               letterSpacing: 1,
             }}
           >
-            Agricultural &amp; Granja Nexus Enterprise System
+            Agro Gestor Network System
           </Typography>
           <Chip
             label="v1.0.0"
