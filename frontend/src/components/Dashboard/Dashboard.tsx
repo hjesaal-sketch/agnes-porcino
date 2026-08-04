@@ -17,7 +17,6 @@ import {
   Snackbar,
   Alert as MuiAlert,
   GridLegacy as Grid,
-  
 } from "@mui/material";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import LocalHospitalIcon from "@mui/icons-material/LocalHospital";
@@ -27,8 +26,8 @@ import InventoryIcon from "@mui/icons-material/Inventory";
 import ScienceIcon from "@mui/icons-material/Science";
 import RoomIcon from "@mui/icons-material/Room";
 import BarChartIcon from "@mui/icons-material/BarChart";
-import  MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
-
+import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
+import InfoIcon from "@mui/icons-material/Info";
 import ErrorIcon from "@mui/icons-material/Error";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
 import PetsIcon from "@mui/icons-material/Pets";
@@ -65,6 +64,7 @@ const menu = [
   { text: "Sitio 3", icon: <RoomIcon />, path: "/sitio3" },
   { text: "Reportes", icon: <BarChartIcon />, path: "/reportes" },
   { text: "Económico", icon: <MonetizationOnIcon />, path: "/economico" },
+  { text: "Acerca de", icon: <InfoIcon />, path: "/acerca-de" },
 ];
 
 type DashboardProps = {

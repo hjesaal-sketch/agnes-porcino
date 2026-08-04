@@ -25,6 +25,7 @@ import Genetica from "./pages/Genetica/Genetica";
 import Sitio2 from "./pages/Sitio2/Sitio2";
 import Sitio3 from "./pages/Sitio3/Sitio3";
 import Animales from "./pages/Animales/Animales";
+import AcercaDe from "./pages/AcercaDe";
 import {
   saveSession,
   clearSession,
@@ -154,7 +155,10 @@ function AppRoutes() {
           path="/usuarios"
           element={isAuthenticated ? <Usuarios /> : <Navigate to="/login" />}
         />
-
+        <Route
+          path="/acerca-de"
+          element={isAuthenticated ? <AcercaDe /> : <Navigate to="/login" />}
+        />
         <Route
           path="/"
           element={
