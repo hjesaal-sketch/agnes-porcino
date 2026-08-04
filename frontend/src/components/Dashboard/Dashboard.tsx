@@ -16,6 +16,8 @@ import {
   Stack,
   Snackbar,
   Alert as MuiAlert,
+  GridLegacy as Grid,
+  
 } from "@mui/material";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import LocalHospitalIcon from "@mui/icons-material/LocalHospital";
@@ -25,8 +27,8 @@ import InventoryIcon from "@mui/icons-material/Inventory";
 import ScienceIcon from "@mui/icons-material/Science";
 import RoomIcon from "@mui/icons-material/Room";
 import BarChartIcon from "@mui/icons-material/BarChart";
-import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
-import EventIcon from "@mui/icons-material/Event";
+import  MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
+
 import ErrorIcon from "@mui/icons-material/Error";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
 import PetsIcon from "@mui/icons-material/Pets";
@@ -75,8 +77,6 @@ export default function Dashboard({ isAuthenticated }: DashboardProps) {
   const [tab, setTab] = useState(0);
   const navigate = useNavigate();
   const [uiAlert, setUiAlert] = useState<UiAlertState>(null);
-
-  // Datos del dashboard
   const [indicadores, setIndicadores] = useState<IndicadorStats | null>(null);
   const [eventos, setEventos] = useState<EventoTarea[]>([]);
   const [resumenReproductivo, setResumenReproductivo] = useState<
@@ -105,13 +105,21 @@ export default function Dashboard({ isAuthenticated }: DashboardProps) {
     cargarDatos();
   }, []);
 
-  // Mapear indicadores a cards dinámicas
-  const indicatorStats = indicadores
+  const indicatorStats: (
+    | {
+        label: string;
+        value: string | number;
+        icon: React.ReactElement;
+        color: string;
+        tooltip: string;
+      }
+    | null
+  )[] = indicadores
     ? [
         {
           label: "Próximos partos",
           value: indicadores.proximos_partos,
-          icon: <AgriculturalIcon />,
+          icon: <LocalHospitalIcon />,
           color: "#f8fafc",
           tooltip: "Hembras próximas a parto",
         },
@@ -125,7 +133,7 @@ export default function Dashboard({ isAuthenticated }: DashboardProps) {
         {
           label: "Mortalidad",
           value: indicadores.mortalidad,
-          icon: <LocalHospitalIcon />,
+          icon: <PetsIcon />,
           color: "#f3e8ff",
           tooltip: "Mortalidad reciente",
         },
@@ -139,21 +147,21 @@ export default function Dashboard({ isAuthenticated }: DashboardProps) {
         {
           label: "Medicamento bajo",
           value: indicadores.medicamento_bajo,
-          icon: <ScienceIcon />,
+          icon: <InventoryIcon />,
           color: "#e1f5fe",
           tooltip: "Inventario bajo de medicamento",
         },
         {
           label: "Celos recientes",
           value: indicadores.celos_recientes,
-          icon: <PetsIcon />,
+          icon: <BabyIcon />,
           color: "#fce4ec",
           tooltip: "Detectados en los últimos días",
         },
         {
           label: "Listos para destete",
           value: indicadores.listos_destete,
-          icon: <BabyIcon />,
+          icon: <AgriculturalIcon />,
           color: "#e8fce7",
           tooltip: "Lotes listos para destetar",
         },
@@ -164,18 +172,12 @@ export default function Dashboard({ isAuthenticated }: DashboardProps) {
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setTab(newValue);
-
-    // Mapeo de tabs a rutas
-    const tabRoutes = [
-      "/dashboard", // 0 - Visión General
-      "/reportes", // 1 - Análisis (Indicadores + Historial + Reportes)
-    ];
-
+    const tabRoutes = ["/dashboard", "/reportes"];
     navigate(tabRoutes[newValue]);
   };
 
   return (
-    <Box sx={{ display: "flex", minHeight: "100vh", background: "#f7f7f7" }}>
+    <Box sx={{ display: "flex" }}>
       <Drawer
         variant="permanent"
         sx={{
@@ -184,242 +186,204 @@ export default function Dashboard({ isAuthenticated }: DashboardProps) {
           "& .MuiDrawer-paper": {
             width: SIDEBAR_WIDTH,
             boxSizing: "border-box",
-            background: "#1d3557",
-            color: "#fff",
+            backgroundColor: "#0e2e1f",
+            borderRight: "none",
           },
         }}
       >
-        <Box sx={{ height: 64 }} />
-        <List sx={{ mt: 2 }}>
+        <Box sx={{ p: 2 }}>
+          <Typography
+            variant="h6"
+            sx={{ color: "#fff", fontWeight: 600, letterSpacing: 1 }}
+          >
+            AGNES
+          </Typography>
+        </Box>
+        <List>
           {menu.map((i) => (
             <ListItemButton
               key={i.text}
               onClick={() => navigate(i.path)}
               sx={{
-                color: window.location.pathname === i.path ? "#169b62" : "#fff",
+                color:
+                  window.location.pathname === i.path
+                    ? "#169b62"
+                    : "#fff",
                 background:
                   window.location.pathname === i.path
                     ? "rgba(22, 155, 98, 0.09)"
                     : "none",
               }}
             >
-              <ListItemIcon sx={{ color: "#169b62" }}>{i.icon}</ListItemIcon>
-              <ListItemText primary={i.text} />
+              <ListItemIcon sx={{ color: "inherit" }}>{i.icon}</ListItemIcon>
+              <ListItemText primary={i.text} sx={{ color: "inherit" }} />
             </ListItemButton>
           ))}
         </List>
       </Drawer>
-
-      <Box sx={{ flexGrow: 1, pt: 10, pl: 0, pr: 0 }}>
-        <Box sx={{ background: "#fff", pt: 3, pb: 1, px: 4 }}>
-          <Typography variant="h5" sx={{ fontWeight: 700 }}>
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          p: 3,
+          pt: 10,
+          minHeight: "100vh",
+          backgroundColor: "#f5f7f9",
+        }}
+      >
+        <Box sx={{ mb: 3 }}>
+          <Typography variant="h5" sx={{ fontWeight: 700, color: "#0e2e1f" }}>
             Dashboard sanitario-zoosanitario
           </Typography>
-          <Tabs
-            value={tab}
-            onChange={handleTabChange}
-            textColor="primary"
-            indicatorColor="primary"
-            sx={{ minHeight: 48 }}
-          >
-            <Tab label="VISIÓN GENERAL" />
-            <Tab label="ANÁLISIS" />
-          </Tabs>
         </Box>
 
-        {/* Mostrar contenido solo en la primera tab (Visión General) */}
+        <Tabs value={tab} onChange={handleTabChange} sx={{ mb: 3 }}>
+          <Tab label="Visión general" />
+          <Tab label="Análisis" />
+        </Tabs>
+        
         {tab === 0 && (
           <>
-            {/* Indicadores dinámicos */}
-            <Stack
-              direction="row"
-              spacing={2}
-              sx={{ px: 4, py: 3, flexWrap: "wrap", gap: 2 }}
-            >
-              {indicatorStats.map((stat) => (
-                <Tooltip key={stat.label} title={stat.tooltip} arrow>
-                  <Card
-                    sx={{
-                      background: stat.color,
-                      minWidth: 180,
-                      minHeight: 110,
-                      mb: 2,
-                      cursor: "pointer",
-                      borderRadius: 3,
-                      boxShadow: 1,
-                    }}
-                  >
-                    <CardContent>
-                      <Box
-                        sx={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 1.2,
-                        }}
-                      >
-                        {stat.icon}
+            <Grid container spacing={2} sx={{ mb: 3 }}>
+              {indicatorStats.map((stat, idx) =>
+                stat ? (
+                  <Grid item xs={6} sm={4} md={3} key={idx}>
+                    <Card sx={{ backgroundColor: stat.color, boxShadow: 1 }}>
+                      <CardContent sx={{ p: 2, textAlign: "center" }}>
+                        <Tooltip title={stat.tooltip}>
+                          <Box sx={{ color: "#169b62", mb: 0.5 }}>
+                            {stat.icon}
+                          </Box>
+                        </Tooltip>
                         <Typography
-                          sx={{ fontSize: 15, fontWeight: 700 }}
+                          variant="body2"
+                          color="text.secondary"
+                          sx={{ fontSize: "0.75rem" }}
                         >
                           {stat.label}
                         </Typography>
-                      </Box>
-                      <Typography
-                        variant="h4"
-                        sx={{ color: "#27632a", fontWeight: 700 }}
-                      >
-                        {stat.value}
-                      </Typography>
-                    </CardContent>
-                  </Card>
-                </Tooltip>
-              ))}
-            </Stack>
-
-            <Box
-              sx={{
-                px: 4,
-                pb: 4,
-                display: "flex",
-                gap: 2,
-                flexWrap: "wrap",
-              }}
-            >
-              {/* Gráfica de Resumen Reproductivo */}
-              <Card sx={{ flex: 2, minWidth: 300, minHeight: 300 }}>
-                <CardContent>
-                  <Typography
-                    variant="h6"
-                    sx={{ fontWeight: "bold", mb: 2 }}
-                  >
-                    <BarChartIcon color="success" sx={{ mr: 1 }} />
-                    Resumen reproductivo
-                  </Typography>
-                  {resumenReproductivo.length > 0 ? (
-                    <Box sx={{ width: "100%", height: 250 }}>
-                      <ResponsiveContainer width="100%" height="100%">
-                        <LineChart
-                          data={resumenReproductivo}
-                          margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
+                        <Typography
+                          variant="h5"
+                          sx={{ fontWeight: 700, color: "#169b62" }}
                         >
-                          <CartesianGrid
-                            strokeDasharray="3 3"
-                            stroke="#e0e0e0"
-                          />
-                          <XAxis dataKey="mes" />
+                          {stat.value}
+                        </Typography>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                ) : null
+              )}
+            </Grid>
+
+            <Grid container spacing={2}>
+              <Grid item xs={12} md={8}>
+                <Card sx={{ boxShadow: 1 }}>
+                  <CardContent>
+                    <Typography variant="h6" sx={{ mb: 2 }}>
+                      Resumen reproductivo
+                    </Typography>
+                    {resumenReproductivo.length > 0 ? (
+                      <ResponsiveContainer width="100%" height={300}>
+                        <LineChart data={resumenReproductivo}>
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis dataKey="fecha" />
                           <YAxis />
                           <RechartsTooltip />
                           <Legend />
                           <Line
                             type="monotone"
                             dataKey="partos"
-                            name="Partos"
                             stroke="#169b62"
-                            strokeWidth={2}
-                            dot={{ r: 3 }}
+                            name="Partos"
                           />
                           <Line
                             type="monotone"
-                            dataKey="fallos"
-                            name="Fallos"
-                            stroke="#ff6b6b"
-                            strokeWidth={2}
-                            dot={{ r: 3 }}
-                          />
-                          <Line
-                            type="monotone"
-                            dataKey="mortalidad"
-                            name="Mortalidad"
-                            stroke="#ffa94d"
-                            strokeWidth={2}
-                            dot={{ r: 3 }}
-                          />
-                          <Line
-                            type="monotone"
-                            dataKey="destetes"
-                            name="Destetes"
-                            stroke="#4dabf7"
-                            strokeWidth={2}
-                            dot={{ r: 3 }}
+                            dataKey="nacidos"
+                            stroke="#2196f3"
+                            name="Nacidos"
                           />
                         </LineChart>
                       </ResponsiveContainer>
-                    </Box>
-                  ) : (
-                    <Typography variant="body2" sx={{ color: "#666" }}>
-                      Sin datos de resumen reproductivo
-                    </Typography>
-                  )}
-                </CardContent>
-              </Card>
-
-              {/* Próximos eventos y tareas */}
-              <Card sx={{ flex: 1, minWidth: 240, minHeight: 300 }}>
-                <CardContent>
-                  <Typography
-                    variant="h6"
-                    sx={{ fontWeight: "bold", mb: 2 }}
-                  >
-                    <EventIcon color="primary" sx={{ mr: 1 }} />
-                    Próximos eventos y tareas
-                  </Typography>
-                  {eventos.length > 0 ? (
-                    <Box sx={{ maxHeight: 250, overflowY: "auto" }}>
-                      {eventos.slice(0, 5).map((evento) => (
-                        <Typography
-                          key={evento.id}
-                          variant="body2"
-                          sx={{
-                            mb: 1,
-                            pb: 1,
-                            borderBottom: "1px solid #eee",
-                          }}
-                        >
-                          <strong>{evento.tipo}:</strong> {evento.descripcion} (
-                          {evento.cantidad}) -{" "}
-                          {new Date(
-                            evento.fecha_evento
-                          ).toLocaleDateString()}
+                    ) : (
+                      <Box sx={{ textAlign: "center", py: 4, color: "#999" }}>
+                        <ErrorIcon sx={{ fontSize: 48, mb: 1 }} />
+                        <Typography>
+                          Sin datos de resumen reproductivo
                         </Typography>
-                      ))}
-                    </Box>
-                  ) : (
-                    <Typography variant="body2" sx={{ color: "#666" }}>
-                      Sin eventos próximos
+                      </Box>
+                    )}
+                  </CardContent>
+                </Card>
+              </Grid>
+
+              <Grid item xs={12} md={4}>
+                <Card sx={{ boxShadow: 1 }}>
+                  <CardContent>
+                    <Typography variant="h6" sx={{ mb: 2 }}>
+                      Próximos eventos y tareas
                     </Typography>
-                  )}
-                </CardContent>
-              </Card>
-            </Box>
+                    {eventos.length > 0 ? (
+                      <Stack spacing={1.5}>
+                        {eventos.slice(0, 5).map((evento, i) => (
+                          <Box
+                            key={i}
+                            sx={{
+                              p: 1.5,
+                              borderRadius: 1,
+                              backgroundColor: "#f5f7f9",
+                            }}
+                          >
+                            <Typography variant="body2">
+                              <strong>{evento.tipo}:</strong> {evento.descripcion}
+                              {" "}
+                              ({evento.cantidad}) -{" "}
+                              {new Date(evento.fecha_evento).toLocaleDateString()}
+                            </Typography>
+                          </Box>
+                        ))}
+                      </Stack>
+                    ) : (
+                      <Box sx={{ textAlign: "center", py: 4, color: "#999" }}>
+                        <Typography>Sin eventos próximos</Typography>
+                      </Box>
+                    )}
+                  </CardContent>
+                </Card>
+              </Grid>
+            </Grid>
           </>
         )}
 
         {tab === 1 && (
-          <Box sx={{ px: 4, py: 3 }}>
-            <Typography variant="h6">ANÁLISIS DETALLADO</Typography>
-            <Typography variant="body2" sx={{ color: "#666", mt: 2 }}>
+          <Card sx={{ boxShadow: 1, p: 3, textAlign: "center" }}>
+            <Box sx={{ color: "#999", mb: 1 }}>
+              <ErrorIcon sx={{ fontSize: 48 }} />
+            </Box>
+            <Typography variant="h6">
+              ANÁLISIS DETALLADO
+            </Typography>
+            <Typography color="text.secondary" sx={{ mt: 1 }}>
               Indicadores, Historial y Reportes disponibles en la sección de
               Análisis...
             </Typography>
-          </Box>
+          </Card>
         )}
-      </Box>
 
-      <Snackbar
-        open={!!uiAlert}
-        autoHideDuration={3200}
-        onClose={handleCloseSnackbar}
-      >
-        {uiAlert ? (
+        <Snackbar
+          open={!!uiAlert}
+          autoHideDuration={6000}
+          onClose={handleCloseSnackbar}
+          anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+        >
           <MuiAlert
             onClose={handleCloseSnackbar}
-            severity={uiAlert.type}
+            severity={uiAlert?.type}
             sx={{ width: "100%" }}
           >
-            {uiAlert.msg}
+            {uiAlert?.msg}
           </MuiAlert>
-        ) : undefined}
-      </Snackbar>
+        </Snackbar>
+      </Box>
     </Box>
   );
 }

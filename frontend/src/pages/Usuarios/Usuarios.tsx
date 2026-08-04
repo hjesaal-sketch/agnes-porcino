@@ -1,4 +1,4 @@
-// src/pages/Usuarios/Usuarios.tsx
+// frontend/src/pages/Usuarios/Usuarios.tsx
 import React, { useEffect, useState } from "react";
 import {
   Box,
@@ -34,7 +34,7 @@ import PeopleIcon from "@mui/icons-material/People";
 import { useNavigate } from "react-router-dom";
 import {
   getUsuarios,
-  addUsuario,
+  createUsuario,
   updateUsuario,
   deleteUsuario,
   Usuario,
@@ -136,24 +136,67 @@ export default function Usuarios() {
           type: "success",
         });
       } else {
-        const nuevo = await addUsuario({
+        const empresaIdGuardado = localStorage.getItem("empresa_id");
+
+        if (!empresaIdGuardado) {
+          setUiAlert({
+            msg: "No se encontró la empresa del usuario actual. Debes iniciar sesión nuevamente.",
+            type: "error",
+          });
+          return;
+        }
+
+        const empresa_id = Number(empresaIdGuardado);
+
+        if (Number.isNaN(empresa_id)) {
+          setUiAlert({
+            msg: "El identificador de empresa es inválido. Debes iniciar sesión nuevamente.",
+            type: "error",
+          });
+          return;
+        }
+
+        const nuevo = await createUsuario({
           nombre: form.nombre,
           email: form.email,
           rol: form.rol,
           activo: form.activo,
+          empresa_id,
         });
+
         setUsuarios((prev) => [nuevo, ...prev]);
         setUiAlert({
           msg: "Usuario creado correctamente",
           type: "success",
         });
       }
+
       setShowDialog(false);
       setEditId(null);
       limpiarForm();
     } catch (e: any) {
+      const detail = e?.response?.data?.detail;
+
+      let mensaje = "Error al guardar usuario";
+
+      if (Array.isArray(detail)) {
+        mensaje = detail
+          .map((item: any) => {
+            const campo = Array.isArray(item?.loc)
+              ? item.loc.join(".")
+              : "campo";
+            const texto = item?.msg || "Error de validación";
+            return `${campo}: ${texto}`;
+          })
+          .join(", ");
+      } else if (typeof detail === "string") {
+        mensaje = detail;
+      } else if (e?.message) {
+        mensaje = e.message;
+      }
+
       setUiAlert({
-        msg: e?.message || "Error al guardar usuario",
+        msg: mensaje,
         type: "error",
       });
     }
@@ -181,8 +224,28 @@ export default function Usuarios() {
         type: "success",
       });
     } catch (e: any) {
+      const detail = e?.response?.data?.detail;
+
+      let mensaje = "Error al eliminar usuario";
+
+      if (Array.isArray(detail)) {
+        mensaje = detail
+          .map((item: any) => {
+            const campo = Array.isArray(item?.loc)
+              ? item.loc.join(".")
+              : "campo";
+            const texto = item?.msg || "Error de validación";
+            return `${campo}: ${texto}`;
+          })
+          .join(", ");
+      } else if (typeof detail === "string") {
+        mensaje = detail;
+      } else if (e?.message) {
+        mensaje = e.message;
+      }
+
       setUiAlert({
-        msg: e?.message || "Error al eliminar usuario",
+        msg: mensaje,
         type: "error",
       });
     }
@@ -416,8 +479,13 @@ export default function Usuarios() {
         }}
         maxWidth="sm"
         fullWidth
+        PaperProps={{
+          sx: {
+            pt: 1.5,
+          },
+        }}
       >
-        <DialogTitle>
+        <DialogTitle sx={{ pb: 1.5 }}>
           {editId ? "Editar Usuario" : "Nuevo Usuario"}
         </DialogTitle>
         <DialogContent
@@ -428,14 +496,18 @@ export default function Usuarios() {
             pt: 3,
           }}
         >
-          <TextField
-            label="Nombre"
-            value={form.nombre}
-            onChange={(e) =>
-              setForm((f) => ({ ...f, nombre: e.target.value }))
-            }
-            fullWidth
-          />
+          <Box sx={{ mt: 0.5 }}>
+            <TextField
+              label="Nombre"
+              value={form.nombre}
+              onChange={(e) =>
+                setForm((f) => ({ ...f, nombre: e.target.value }))
+              }
+              fullWidth
+              variant="outlined"
+              size="medium"
+            />
+          </Box>
           <TextField
             label="Correo electrónico"
             type="email"

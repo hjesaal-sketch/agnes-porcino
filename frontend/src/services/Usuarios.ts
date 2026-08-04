@@ -1,7 +1,15 @@
-//frontend/src/services/Usuarios.ts
+// frontend/src/services/Usuarios.ts
 import API_BASE from "../config/api";
 
-export type RolUsuario = "Dueño" | "Gerente General" | "Gerente de Granja" | "Operador" | "Administrador" | "Consultor" | "Veterinario";
+export type RolUsuario =
+  | "Dueño"
+  | "Gerente General"
+  | "Gerente de Granja"
+  | "Operador"
+  | "Administrador"
+  | "Consultor"
+  | "Veterinario"
+  | "Maestro";
 
 export type Usuario = {
   id: number;
@@ -13,9 +21,35 @@ export type Usuario = {
   ultima_sesion: string | null;
 };
 
-export type NuevoUsuario = Omit<Usuario, "id" | "empresa_id" | "ultima_sesion">;
+export type NuevoUsuario = {
+  empresa_id: number;
+  nombre: string;
+  email: string;
+  rol: RolUsuario;
+  activo: boolean;
+};
 
 const EMPRESA_ID = 1;
+
+function getErrorMessage(error: any, fallback: string): string {
+  if (typeof error?.detail === "string") {
+    return error.detail;
+  }
+
+  if (Array.isArray(error?.detail)) {
+    return error.detail
+      .map((item: any) => {
+        const campo = Array.isArray(item?.loc)
+          ? item.loc.join(".")
+          : "campo";
+        const texto = item?.msg || "Error de validación";
+        return `${campo}: ${texto}`;
+      })
+      .join(", ");
+  }
+
+  return fallback;
+}
 
 function mapApiToUsuario(api: any): Usuario {
   return {
@@ -33,46 +67,51 @@ export async function getUsuarios(): Promise<Usuario[]> {
   const url = new URL(`${API_BASE}/usuarios/`, window.location.origin);
   url.searchParams.set("empresa_id", String(EMPRESA_ID));
 
-  const res = await fetch(url.toString());
+  const res = await fetch(url.toString(), {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+  });
+
   if (!res.ok) {
-    throw new Error("Error al obtener usuarios");
+    const error = await res.json();
+    throw new Error(getErrorMessage(error, "Error al obtener usuarios"));
   }
+
   const data = await res.json();
   return data.map(mapApiToUsuario);
 }
 
-export async function addUsuario(
-  payload: Omit<NuevoUsuario, "empresa_id">
-): Promise<Usuario> {
-  const body = {
-    empresa_id: EMPRESA_ID,
-    ...payload,
-  };
+export async function createUsuario(body: NuevoUsuario): Promise<Usuario> {
   const res = await fetch(`${API_BASE}/usuarios/`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
   });
+
   if (!res.ok) {
     const error = await res.json();
-    throw new Error(error.detail || "Error al crear usuario");
+    throw new Error(getErrorMessage(error, "Error al crear usuario"));
   }
+
   const data = await res.json();
   return mapApiToUsuario(data);
 }
 
 export async function updateUsuario(
   id: number,
-  payload: Partial<Omit<NuevoUsuario, "empresa_id">>
+  payload: Partial<Omit<NuevoUsuario, "empresa_id" | "email">>
 ): Promise<Usuario> {
   const res = await fetch(`${API_BASE}/usuarios/${id}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
+
   if (!res.ok) {
-    throw new Error("Error al actualizar usuario");
+    const error = await res.json();
+    throw new Error(getErrorMessage(error, "Error al actualizar usuario"));
   }
+
   const data = await res.json();
   return mapApiToUsuario(data);
 }
@@ -81,7 +120,9 @@ export async function deleteUsuario(id: number): Promise<void> {
   const res = await fetch(`${API_BASE}/usuarios/${id}`, {
     method: "DELETE",
   });
+
   if (!res.ok) {
-    throw new Error("Error al eliminar usuario");
+    const error = await res.json();
+    throw new Error(getErrorMessage(error, "Error al eliminar usuario"));
   }
 }

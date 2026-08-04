@@ -2,15 +2,20 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import logging
+from dotenv import load_dotenv
+
+load_dotenv()
 
 from backend.database import engine, Base
-import backend.models.core.granjas  # importa y registra Granja + modelos con FK
+from backend.models.user import User
+from backend.models.core.granjas import Granja  # importa Granja explícitamente
+from backend.models.core.Empresas import Empresa  # modelo completo con relación granjas
+from backend.utils.security import get_password_hash
 from backend.seeds.dashboard_seed import seed_dashboard
-from backend.seeds.users_seed import seed_users
 from backend.database import SessionLocal  # ✅ CORRECTO
 
 # Routers reales según tu árbol de carpetas
-from backend.api.login import router as login_router
+from backend.api.Auth import router as login_router
 from backend.api.gestacion.Alertas import router as gestacion_alertas_router
 from backend.api.gestacion.Madres import router as gestacion_madres_router
 from backend.api.gestacion.Servicios import router as gestacion_servicios_router
@@ -90,24 +95,20 @@ from backend.api.reportes.Costos import router as reportes_costos_router
 from backend.api.reportes.Alertas import router as reportes_alertas_router
 
 from backend.api.animales import Resumen as AnimalesResumenRouter
-
 from backend.api.Productividad import router as productividad_router
-
 from backend.api.Estadisticas import router as estadisticas_router
-
 from backend.api.Usuarios import router as usuarios_router
-
 from backend.api.Dashboard import router as dashboard_router
 from backend.api.condicion_corporal import Backfat as BackfatRouter
 
-# Creación de la app FastAPI
+Base.registry.configure()
+
 app = FastAPI(
     title="Gestión de Granjas",
     description="Backend API para plataforma de administración y producción porcina.",
     version="1.0.0",
 )
 
-# CORS: permite al frontend consumir la API
 origins = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
@@ -117,21 +118,19 @@ origins = [
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
+    allow_origin_regex=r"https://agnes-porcino(-[a-z0-9-]+)?\.vercel\.app",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Logs básicos
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
 )
 
-# Si aún no usas migraciones, asegura que las tablas existan
 Base.metadata.create_all(bind=engine)
 
-# Monta routers bajo el prefijo /api
 app.include_router(login_router, prefix="/api")
 app.include_router(gestacion_alertas_router, prefix="/api")
 app.include_router(gestacion_madres_router, prefix="/api")
@@ -212,29 +211,48 @@ app.include_router(reportes_costos_router, prefix="/api")
 app.include_router(reportes_alertas_router, prefix="/api")
 
 app.include_router(AnimalesResumenRouter.router, prefix="/api")
-
 app.include_router(productividad_router, prefix="/api")
-
 app.include_router(estadisticas_router, prefix="/api")
-
 app.include_router(usuarios_router, prefix="/api")
-
 app.include_router(dashboard_router, prefix="/api")
-
 app.include_router(BackfatRouter.router, prefix="/api")
 
 
 @app.on_event("startup")
 async def startup():
-  """Ejecuta seed de datos al iniciar la aplicación"""
-  db = SessionLocal()
-  try:
-      seed_dashboard(db)
-      seed_users(db)
-  except Exception as e:
-      print(f"❌ Error al ejecutar seed: {e}")
-  finally:
-      db.close()
+    """Ejecuta seed de datos al iniciar la aplicación"""
+    db = SessionLocal()
+    try:
+        Base.metadata.create_all(bind=engine)
+
+        empresa_nombre = "Empresa Demo"
+
+        empresa = db.query(Empresa).filter_by(nombre=empresa_nombre).first()
+        if not empresa:
+            empresa = Empresa(nombre=empresa_nombre)
+            db.add(empresa)
+            db.commit()
+            db.refresh(empresa)
+
+        admin_email = "admin@empresa.com"
+        admin = db.query(User).filter_by(email=admin_email).first()
+        if not admin:
+            admin = User(
+                nombre="Admin General",
+                email=admin_email,
+                hashed_password=get_password_hash("admin123"),
+                role="admin",
+                empresa_id=empresa.id,
+            )
+            db.add(admin)
+            db.commit()
+            db.refresh(admin)
+
+        seed_dashboard(db)
+    except Exception as e:
+        print(f"❌ Error al ejecutar seed: {e}")
+    finally:
+        db.close()
 
 
 @app.get("/ping")

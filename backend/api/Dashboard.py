@@ -1,4 +1,4 @@
-# backend/api/Dashboard.py
+#backend/api/Dashboard.py
 from typing import List
 from datetime import datetime
 
@@ -6,6 +6,7 @@ from fastapi import APIRouter, Depends, status, HTTPException
 from sqlalchemy.orm import Session
 
 from backend.database import get_db
+from backend.models.user import User
 from backend.models.Dashboard import (
     DashboardRepository,
     IndicadorRead,
@@ -15,6 +16,7 @@ from backend.models.Dashboard import (
     ResumenReproductivoRead,
     ResumenReproductivoCreate,
 )
+from backend.utils.security import get_current_user
 
 router = APIRouter(
     prefix="/dashboard",
@@ -36,7 +38,11 @@ def obtener_indicadores(
     empresa_id: int,
     granja_id: int,
     repo: DashboardRepository = Depends(get_repo),
+    current_user: User = Depends(get_current_user),
 ):
+    if current_user.empresa_id != empresa_id:
+        raise HTTPException(status_code=403, detail="No autorizado")
+
     indicadores = repo.obtener_indicadores(empresa_id, granja_id)
     if not indicadores:
         raise HTTPException(status_code=404, detail="Indicadores no encontrados")
@@ -51,7 +57,11 @@ def obtener_indicadores(
 def crear_actualizar_indicadores(
     payload: IndicadorCreate,
     repo: DashboardRepository = Depends(get_repo),
+    current_user: User = Depends(get_current_user),
 ):
+    if current_user.empresa_id != payload.empresa_id:
+        raise HTTPException(status_code=403, detail="No autorizado")
+
     return repo.crear_actualizar_indicadores(payload)
 
 
@@ -66,7 +76,11 @@ def listar_eventos_tareas(
     granja_id: int,
     completado: bool = False,
     repo: DashboardRepository = Depends(get_repo),
+    current_user: User = Depends(get_current_user),
 ):
+    if current_user.empresa_id != empresa_id:
+        raise HTTPException(status_code=403, detail="No autorizado")
+
     return repo.listar_eventos_tareas(empresa_id, granja_id, completado)
 
 
@@ -79,7 +93,11 @@ def listar_eventos_tareas(
 def crear_evento_tarea(
     payload: EventoTareaCreate,
     repo: DashboardRepository = Depends(get_repo),
+    current_user: User = Depends(get_current_user),
 ):
+    if current_user.empresa_id != payload.empresa_id:
+        raise HTTPException(status_code=403, detail="No autorizado")
+
     return repo.crear_evento_tarea(payload)
 
 
@@ -91,10 +109,15 @@ def crear_evento_tarea(
 def marcar_completado(
     id: int,
     repo: DashboardRepository = Depends(get_repo),
+    current_user: User = Depends(get_current_user),
 ):
     evento = repo.marcar_evento_completado(id)
     if not evento:
         raise HTTPException(status_code=404, detail="Evento no encontrado")
+
+    if current_user.empresa_id != evento.empresa_id:
+        raise HTTPException(status_code=403, detail="No autorizado")
+
     return evento
 
 
@@ -108,7 +131,11 @@ def listar_resumen_reproductivo(
     empresa_id: int,
     granja_id: int,
     repo: DashboardRepository = Depends(get_repo),
+    current_user: User = Depends(get_current_user),
 ):
+    if current_user.empresa_id != empresa_id:
+        raise HTTPException(status_code=403, detail="No autorizado")
+
     return repo.listar_resumen_reproductivo(empresa_id, granja_id)
 
 
@@ -121,5 +148,9 @@ def listar_resumen_reproductivo(
 def crear_resumen_reproductivo(
     payload: ResumenReproductivoCreate,
     repo: DashboardRepository = Depends(get_repo),
+    current_user: User = Depends(get_current_user),
 ):
+    if current_user.empresa_id != payload.empresa_id:
+        raise HTTPException(status_code=403, detail="No autorizado")
+
     return repo.crear_resumen_reproductivo(payload)
