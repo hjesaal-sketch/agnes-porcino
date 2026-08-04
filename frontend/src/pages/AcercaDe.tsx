@@ -12,7 +12,6 @@ import {
   Agriculture,
   Scale,
   Psychology,
-  Update,
   Build,
 } from "@mui/icons-material";
 
