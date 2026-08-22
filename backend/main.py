@@ -252,7 +252,7 @@ async def startup():
             db.commit()
             db.refresh(admin)
 
-        seed_dashboard(db)
+       #seed_dashboard(db)
     except Exception as e:
         print(f"❌ Error al ejecutar seed: {e}")
     finally:
