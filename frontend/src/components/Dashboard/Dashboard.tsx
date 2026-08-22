@@ -31,6 +31,7 @@ import InfoIcon from "@mui/icons-material/Info";
 import ErrorIcon from "@mui/icons-material/Error";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
 import PetsIcon from "@mui/icons-material/Pets";
+import HealthAndSafetyIcon from '@mui/icons-material/HealthAndSafety';
 import { useNavigate } from "react-router-dom";
 import {
   getIndicadores,
@@ -64,6 +65,7 @@ const menu = [
   { text: "Sitio 3", icon: <RoomIcon />, path: "/sitio3" },
   { text: "Reportes", icon: <BarChartIcon />, path: "/reportes" },
   { text: "Económico", icon: <MonetizationOnIcon />, path: "/economico" },
+  { text: "Sanidad", icon: <HealthAndSafetyIcon />, path: "/sanidad" },
   { text: "Acerca de", icon: <InfoIcon />, path: "/acerca-de" },
 ];
 

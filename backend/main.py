@@ -101,6 +101,8 @@ from backend.api.Usuarios import router as usuarios_router
 from backend.api.Dashboard import router as dashboard_router
 from backend.api.condicion_corporal import Backfat as BackfatRouter
 
+from backend.api.sanidad import eventos_router as sanidad_eventos_router
+
 Base.registry.configure()
 
 app = FastAPI(
@@ -216,6 +218,8 @@ app.include_router(estadisticas_router, prefix="/api")
 app.include_router(usuarios_router, prefix="/api")
 app.include_router(dashboard_router, prefix="/api")
 app.include_router(BackfatRouter.router, prefix="/api")
+
+app.include_router(sanidad_eventos_router, prefix="/api")
 
 
 @app.on_event("startup")
