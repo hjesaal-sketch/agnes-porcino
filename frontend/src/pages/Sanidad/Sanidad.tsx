@@ -47,7 +47,6 @@ const menu = [
 const Sanidad: React.FC = () => {
   const [tab, setTab] = useState(0);
   const navigate = useNavigate();
-  const [eventos, setEventos] = useState([]);
 
   useEffect(() => {
     cargarEventos();
@@ -56,7 +55,7 @@ const Sanidad: React.FC = () => {
   const cargarEventos = async () => {
     try {
       const data = await getEventosSanitarios();
-      setEventos(data);
+      console.log('Eventos sanitarios:', data);
     } catch (error) {
       console.error('Error cargando eventos:', error);
     }
