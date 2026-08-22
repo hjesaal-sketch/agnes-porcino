@@ -6,8 +6,10 @@ from typing import Optional
 class SanidadEventoBase(BaseModel):
     empresa_id: int
     granja_id: int
-    tipo_animal: str  # 'hembra' o 'verraco'
-    animal_id: int
+    tipo_animal: Optional[str] = None  # 'hembra' o 'verraco'
+    animal_id: Optional[int] = None    # NULL si es lote
+    lote_id: Optional[int] = None      # NULL si es individual
+    cantidad_animales: Optional[int] = 0
     tipo: str  # 'vacunacion', 'desparasitacion', 'tratamiento'
     fecha: date
     insumo_id: int

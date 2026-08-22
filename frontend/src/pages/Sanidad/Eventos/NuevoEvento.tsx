@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Drawer,
@@ -12,6 +12,9 @@ import {
   TextField,
   Button,
   MenuItem,
+  FormControl,
+  InputLabel,
+  Select,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import DashboardIcon from '@mui/icons-material/Dashboard';
@@ -26,6 +29,7 @@ import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
 import HealthAndSafetyIcon from '@mui/icons-material/HealthAndSafety';
 import InfoIcon from '@mui/icons-material/Info';
 import { crearEventoSanitario } from '../../../services/Sanidad';
+import { getLotes } from '../../../services/Lotes';
 
 const SIDEBAR_WIDTH = 220;
 
@@ -46,9 +50,13 @@ const menu = [
 
 const NuevoEvento: React.FC = () => {
   const navigate = useNavigate();
+  const [lotes, setLotes] = useState([]);
+  const [tipoRegistro, setTipoRegistro] = useState('individual');
   const [formData, setFormData] = useState({
     tipo_animal: 'hembra',
     animal_id: '',
+    lote_id: '',
+    cantidad_animales: 0,
     tipo: 'vacunacion',
     fecha: '',
     insumo_id: '',
@@ -61,10 +69,29 @@ const NuevoEvento: React.FC = () => {
     cantidad_consumida: '',
   });
 
+  useEffect(() => {
+    cargarLotes();
+  }, []);
+
+  const cargarLotes = async () => {
+    try {
+      const data = await getLotes();
+      setLotes(data);
+    } catch (error) {
+      console.error('Error cargando lotes:', error);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await crearEventoSanitario(formData);
+      const payload = {
+        ...formData,
+        animal_id: tipoRegistro === 'individual' ? parseInt(formData.animal_id) : null,
+        lote_id: tipoRegistro === 'lote' ? parseInt(formData.lote_id) : null,
+        cantidad_animales: tipoRegistro === 'lote' ? parseInt(formData.cantidad_animales) : 0,
+      };
+      await crearEventoSanitario(payload);
       navigate('/sanidad');
     } catch (error) {
       console.error('Error creando evento:', error);
@@ -125,24 +152,66 @@ const NuevoEvento: React.FC = () => {
             </Typography>
             <form onSubmit={handleSubmit}>
               <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2, mt: 3 }}>
-                <TextField
-                  select
-                  label="Tipo de Animal"
-                  fullWidth
-                  required
-                  value={formData.tipo_animal}
-                  onChange={(e) => setFormData({...formData, tipo_animal: e.target.value})}
-                >
-                  <MenuItem value="hembra">Hembra</MenuItem>
-                  <MenuItem value="verraco">Verraco</MenuItem>
-                </TextField>
-                <TextField
-                  label="ID del Animal"
-                  fullWidth
-                  required
-                  value={formData.animal_id}
-                  onChange={(e) => setFormData({...formData, animal_id: e.target.value})}
-                />
+                <FormControl fullWidth>
+                  <InputLabel>Tipo de Registro</InputLabel>
+                  <Select
+                    value={tipoRegistro}
+                    label="Tipo de Registro"
+                    onChange={(e) => setTipoRegistro(e.target.value)}
+                  >
+                    <MenuItem value="individual">Animal específico</MenuItem>
+                    <MenuItem value="lote">Lote / Grupo</MenuItem>
+                  </Select>
+                </FormControl>
+
+                {tipoRegistro === 'individual' ? (
+                  <>
+                    <TextField
+                      select
+                      label="Tipo de Animal"
+                      fullWidth
+                      required
+                      value={formData.tipo_animal}
+                      onChange={(e) => setFormData({...formData, tipo_animal: e.target.value})}
+                    >
+                      <MenuItem value="hembra">Hembra</MenuItem>
+                      <MenuItem value="verraco">Verraco</MenuItem>
+                    </TextField>
+                    <TextField
+                      label="ID del Animal"
+                      fullWidth
+                      required
+                      value={formData.animal_id}
+                      onChange={(e) => setFormData({...formData, animal_id: e.target.value})}
+                    />
+                  </>
+                ) : (
+                  <>
+                    <TextField
+                      select
+                      label="Lote"
+                      fullWidth
+                      required
+                      value={formData.lote_id}
+                      onChange={(e) => setFormData({...formData, lote_id: e.target.value})}
+                    >
+                      {lotes.map((lote: any) => (
+                        <MenuItem key={lote.id} value={lote.id}>
+                          {lote.nombre} ({lote.cantidad_animales} animales)
+                        </MenuItem>
+                      ))}
+                    </TextField>
+                    <TextField
+                      label="Cantidad de Animales"
+                      type="number"
+                      fullWidth
+                      required
+                      value={formData.cantidad_animales}
+                      onChange={(e) => setFormData({...formData, cantidad_animales: e.target.value})}
+                    />
+                  </>
+                )}
+
                 <TextField
                   select
                   label="Tipo de Evento"
@@ -172,7 +241,7 @@ const NuevoEvento: React.FC = () => {
                   onChange={(e) => setFormData({...formData, insumo_id: e.target.value})}
                 />
                 <TextField
-                  label="Dosis"
+                  label="Dosis por Animal"
                   fullWidth
                   value={formData.dosis}
                   onChange={(e) => setFormData({...formData, dosis: e.target.value})}
@@ -204,11 +273,13 @@ const NuevoEvento: React.FC = () => {
                   onChange={(e) => setFormData({...formData, tecnico: e.target.value})}
                 />
                 <TextField
-                  label="Cantidad Consumida"
+                  label="Cantidad Consumida (por animal)"
+                  type="number"
                   fullWidth
                   required
                   value={formData.cantidad_consumida}
                   onChange={(e) => setFormData({...formData, cantidad_consumida: e.target.value})}
+                  helperText={tipoRegistro === 'lote' ? 'Se multiplicará por la cantidad de animales' : ''}
                 />
                 <TextField
                   label="Observaciones"

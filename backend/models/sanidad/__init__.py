@@ -2,3 +2,4 @@
 from .Eventos import SanidadEvento
 from .Protocolos import SanidadProtocolo
 from .Alertas import SanidadAlerta
+from .Lotes import SanidadLote

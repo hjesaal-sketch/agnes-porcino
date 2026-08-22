@@ -5,7 +5,6 @@ from datetime import datetime, date
 from typing import Optional
 
 from sqlalchemy import Column, Integer, String, Float, Text, Date, DateTime, ForeignKey
-from sqlalchemy.orm import Session
 
 from backend.database import Base
 
@@ -17,9 +16,13 @@ class SanidadEvento(Base):
     empresa_id = Column(Integer, ForeignKey("empresas.id"), nullable=False)
     granja_id = Column(Integer, ForeignKey("granjas.id"), nullable=False)
 
-    # Polimórfico: puede ser hembra (sows) o verraco (genetica_verracos)
-    tipo_animal = Column(String(20), nullable=False)  # 'hembra', 'verraco'
-    animal_id = Column(Integer, nullable=False)
+    # Opción 1: Animal específico
+    tipo_animal = Column(String(20), nullable=True)  # 'hembra', 'verraco'
+    animal_id = Column(Integer, nullable=True)       # NULL si es lote
+
+    # Opción 2: Lote
+    lote_id = Column(Integer, ForeignKey("sanidad_lotes.id"), nullable=True)
+    cantidad_animales = Column(Integer, default=0)
 
     # Datos del evento
     tipo = Column(String(50), nullable=False)  # 'vacunacion', 'desparasitacion', 'tratamiento'
