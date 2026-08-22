@@ -12,7 +12,7 @@ import {
   Tab,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { getEventosSanitarios } from '../../services/sanidad';
+// import { getEventosSanitarios } from '../../services/sanidad'; // COMENTADO TEMPORALMENTE
 
 const Sanidad: React.FC = () => {
   const [tab, setTab] = useState(0);
@@ -25,8 +25,9 @@ const Sanidad: React.FC = () => {
 
   const cargarEventos = async () => {
     try {
-      const data = await getEventosSanitarios();
-      setEventos(data);
+      // const data = await getEventosSanitarios();
+      // setEventos(data);
+      console.log('Servicio de sanidad pendiente de implementar');
     } catch (error) {
       console.error('Error cargando eventos:', error);
     }
