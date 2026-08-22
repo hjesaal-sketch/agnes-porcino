@@ -28,6 +28,7 @@ import Animales from "./pages/Animales/Animales";
 import Sanidad from './pages/Sanidad/Sanidad';
 import NuevoEvento from './pages/Sanidad/Eventos/NuevoEvento';
 import AcercaDe from "./pages/AcercaDe";
+import Typography from '@mui/material/Typography';
 import {
   saveSession,
   clearSession,
