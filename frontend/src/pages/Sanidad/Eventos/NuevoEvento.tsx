@@ -89,7 +89,7 @@ const NuevoEvento: React.FC = () => {
         ...formData,
         animal_id: tipoRegistro === 'individual' ? parseInt(formData.animal_id) : null,
         lote_id: tipoRegistro === 'lote' ? parseInt(formData.lote_id) : null,
-        cantidad_animales: tipoRegistro === 'lote' ? parseInt(formData.cantidad_animales) : 0,
+        cantidad_animales: tipoRegistro === 'lote' ? parseInt(String(formData.cantidad_animales)) : 0,
       };
       await crearEventoSanitario(payload);
       navigate('/sanidad');
