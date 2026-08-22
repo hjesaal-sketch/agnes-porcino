@@ -26,6 +26,7 @@ import Sitio2 from "./pages/Sitio2/Sitio2";
 import Sitio3 from "./pages/Sitio3/Sitio3";
 import Animales from "./pages/Animales/Animales";
 import Sanidad from './pages/Sanidad/Sanidad';
+import NuevoEvento from './pages/Sanidad/Eventos/NuevoEvento';
 import AcercaDe from "./pages/AcercaDe";
 import {
   saveSession,
@@ -159,6 +160,18 @@ function AppRoutes() {
         <Route
           path="/sanidad"
           element={isAuthenticated ? <Sanidad /> : <Navigate to="/login" />}
+        />
+        <Route
+          path="/sanidad/eventos/nuevo"
+          element={isAuthenticated ? <NuevoEvento /> : <Navigate to="/login" />}
+        />
+        <Route
+          path="/sanidad/protocolos"
+          element={isAuthenticated ? <Typography>Protocolos (en construcción)</Typography> : <Navigate to="/login" />}
+        />
+        <Route
+          path="/sanidad/alertas"
+          element={isAuthenticated ? <Typography>Alertas (en construcción)</Typography> : <Navigate to="/login" />}
         />
         <Route
           path="/acerca-de"
