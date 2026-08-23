@@ -165,11 +165,11 @@ class DashboardRepository:
     ) -> Optional[DashboardIndicador]:
         from backend.models.gestacion.Madres import Madre
         from backend.models.gestacion.Servicios import ServicioGestacion as GestacionServicio
-        from backend.models.maternidad.Ingreso import MaternidadIngreso
+        from backend.models.maternidad.Ingreso import IngresoMaternidad as MaternidadIngreso
         from backend.models.insumos.Alimentos import AlimentoModel
         from backend.models.insumos.Medicamentos import MedicamentoModel
 
-        # 1. Próximos partos (hembras en gestación con parto en los próximos 30 días)
+        # 1. Próximos partos
         fecha_limite = datetime.now().date() + timedelta(days=30)
         proximos_partos = self.db.query(Madre).filter(
             Madre.granja_id == granja_id,
@@ -177,7 +177,7 @@ class DashboardRepository:
             Madre.fecha_probable_parto <= fecha_limite
         ).count()
 
-        # 2. Fallos reproductivos (servicios fallidos en los últimos 30 días)
+        # 2. Fallos reproductivos
         fecha_limite = datetime.now().date() - timedelta(days=30)
         fallos_reproductivos = self.db.query(GestacionServicio).filter(
             GestacionServicio.granja_id == granja_id,
@@ -185,7 +185,7 @@ class DashboardRepository:
             GestacionServicio.fecha >= fecha_limite
         ).count()
 
-        # 3. Mortalidad (en los últimos 30 días)
+        # 3. Mortalidad
         fecha_limite = datetime.now().date() - timedelta(days=30)
         mortalidad = self.db.query(MaternidadIngreso).filter(
             MaternidadIngreso.granja_id == granja_id,
@@ -193,19 +193,19 @@ class DashboardRepository:
             MaternidadIngreso.fecha >= fecha_limite
         ).count()
 
-        # 4. Alimentos con stock bajo (< 10 unidades)
+        # 4. Alimentos con stock bajo
         alimento_bajo = self.db.query(AlimentoModel).filter(
             AlimentoModel.granja_id == granja_id,
             AlimentoModel.stock < 10.0
         ).count()
 
-        # 5. Medicamentos con stock bajo (< 10 unidades)
+        # 5. Medicamentos con stock bajo
         medicamento_bajo = self.db.query(MedicamentoModel).filter(
             MedicamentoModel.granja_id == granja_id,
             MedicamentoModel.stock < 10.0
         ).count()
 
-        # 6. Celos recientes (en los últimos 7 días)
+        # 6. Celos recientes
         fecha_limite = datetime.now().date() - timedelta(days=7)
         celos_recientes = self.db.query(GestacionServicio).filter(
             GestacionServicio.granja_id == granja_id,
@@ -213,14 +213,13 @@ class DashboardRepository:
             GestacionServicio.fecha >= fecha_limite
         ).count()
 
-        # 7. Listos para destete (lechones con edad >= 21 días)
+        # 7. Listos para destete
         listos_destete = self.db.query(MaternidadIngreso).filter(
             MaternidadIngreso.granja_id == granja_id,
             MaternidadIngreso.edad_dias >= 21,
             MaternidadIngreso.estado == 'Activo'
         ).count()
 
-        # Buscar o crear el registro de indicadores
         indicador = self.db.query(DashboardIndicador).filter(
             DashboardIndicador.empresa_id == empresa_id,
             DashboardIndicador.granja_id == granja_id
