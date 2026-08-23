@@ -54,23 +54,33 @@ def obtener_resumen_animales(
 
     modulos: list[ResumenModulo] = []
 
-    # ========================
-    # 1) Gestación (madres)
-    # ========================
-    # Todas las hembras ubicadas en gestación, gestantes y no gestantes.
-    gestacion_count = (
-        db.query(func.count(Madre.id))
-        .filter(
-            Madre.granja_id == granja_id,
-            Madre.activo.is_(True),
-            Madre.estado_actual == "Gestación",
+        # ========================
+        # 1) Gestación (madres)
+        # ========================
+        # Contar MADRES EN GESTACIÓN según servicios activos
+        # 1.1 Madres con servicios que tienen resultado 'Gestación confirmada' o 'Pendiente'
+        # 1.2 Y que NO han tenido parto aún (no están en maternidad)
+        
+        # Obtener IDs de madres con servicios en gestación activa
+        madres_gestacion_ids = db.query(ServicioGestacion.sow_id).filter(
+            ServicioGestacion.granja_id == granja_id,
+            ServicioGestacion.resultado.in_(['Gestación confirmada', 'Pendiente'])
+        ).distinct().subquery()
+        
+        # Contar madres activas que están en gestación
+        gestacion_count = (
+            db.query(func.count(Madre.id))
+            .filter(
+                Madre.granja_id == granja_id,
+                Madre.activo.is_(True),
+                Madre.id.in_(madres_gestacion_ids)
+            )
+            .scalar()
+            or 0
         )
-        .scalar()
-        or 0
-    )
-    modulos.append(
-        ResumenModulo(modulo="Gestación", cantidad=gestacion_count)
-    )
+        modulos.append(
+            ResumenModulo(modulo="Gestación", cantidad=gestacion_count)
+        )
 
     # ========================
     # 2) Maternidad
