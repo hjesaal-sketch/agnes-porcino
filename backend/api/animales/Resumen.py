@@ -8,8 +8,8 @@ from sqlalchemy import func
 from backend.database import get_db
 
 # Gestación
-from backend.models.gestacion.Madres import Madre  # tu modelo real de madres gestación
-from backend.models.gestacion.Servicios import ServicioGestacion  # <--- NUEVA LÍNEA
+from backend.models.gestacion.Madres import Madre
+from backend.models.gestacion.Servicios import ServicioGestacion
 
 # Maternidad
 from backend.models.maternidad.Ingreso import IngresoMaternidad
@@ -39,8 +39,6 @@ router = APIRouter(
 )
 
 
-# En el futuro, esto debe salir del token (tenant).
-# Por ahora se recibe empresa_id y granja_id y se valida mínimamente.
 @router.get("/", response_model=ResumenAnimales)
 def obtener_resumen_animales(
     empresa_id: int,
@@ -55,33 +53,30 @@ def obtener_resumen_animales(
 
     modulos: list[ResumenModulo] = []
 
-        # ========================
-        # 1) Gestación (madres)
-        # ========================
-        # Contar MADRES EN GESTACIÓN según servicios activos
-        # 1.1 Madres con servicios que tienen resultado 'Gestación confirmada' o 'Pendiente'
-        # 1.2 Y que NO han tenido parto aún (no están en maternidad)
-        
-        # Obtener IDs de madres con servicios en gestación activa
-        madres_gestacion_ids = db.query(ServicioGestacion.sow_id).filter(
-            ServicioGestacion.granja_id == granja_id,
-            ServicioGestacion.resultado.in_(['Gestación confirmada', 'Pendiente'])
-        ).distinct().subquery()
-        
-        # Contar madres activas que están en gestación
-        gestacion_count = (
-            db.query(func.count(Madre.id))
-            .filter(
-                Madre.granja_id == granja_id,
-                Madre.activo.is_(True),
-                Madre.id.in_(madres_gestacion_ids)
-            )
-            .scalar()
-            or 0
+    # ========================
+    # 1) Gestación (madres)
+    # ========================
+    # Contar MADRES EN GESTACIÓN según servicios activos
+    # Obtener IDs de madres con servicios en gestación activa
+    madres_gestacion_ids = db.query(ServicioGestacion.sow_id).filter(
+        ServicioGestacion.granja_id == granja_id,
+        ServicioGestacion.resultado.in_(['Gestación confirmada', 'Pendiente'])
+    ).distinct().subquery()
+
+    # Contar madres activas que están en gestación
+    gestacion_count = (
+        db.query(func.count(Madre.id))
+        .filter(
+            Madre.granja_id == granja_id,
+            Madre.activo.is_(True),
+            Madre.id.in_(madres_gestacion_ids)
         )
-        modulos.append(
-            ResumenModulo(modulo="Gestación", cantidad=gestacion_count)
-        )
+        .scalar()
+        or 0
+    )
+    modulos.append(
+        ResumenModulo(modulo="Gestación", cantidad=gestacion_count)
+    )
 
     # ========================
     # 2) Maternidad
@@ -98,7 +93,6 @@ def obtener_resumen_animales(
     )
 
     # 2.2 Lechones vivos = nacidos vivos - mortalidad lechones - destetados
-    # Usa el nombre real de la columna de PartoMaternidad (aquí: nacidos_vivos)
     lechones_nacidos_vivos = (
         db.query(
             func.coalesce(func.sum(PartoMaternidad.nacidos_vivos), 0)
