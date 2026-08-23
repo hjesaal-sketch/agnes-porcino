@@ -3,7 +3,6 @@ from __future__ import annotations
 
 from datetime import datetime, timedelta
 from typing import Optional, List
-from enum import Enum
 
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Float, Boolean
 from sqlalchemy.orm import Session
@@ -165,19 +164,20 @@ class DashboardRepository:
     ) -> Optional[DashboardIndicador]:
         from backend.models.gestacion.Madres import Madre
         from backend.models.gestacion.Servicios import ServicioGestacion as GestacionServicio
+        from backend.models.gestacion.Partos import PartoProgramado
         from backend.models.maternidad.Ingreso import IngresoMaternidad as MaternidadIngreso
         from backend.models.insumos.Alimentos import AlimentoModel
         from backend.models.insumos.Medicamentos import MedicamentoModel
 
-        # 1. Próximos partos
+        # 1. Próximos partos (usando scheduled_farrowings)
         fecha_limite = datetime.now().date() + timedelta(days=30)
-        proximos_partos = self.db.query(Madre).filter(
-            Madre.granja_id == granja_id,
-            Madre.estado_actual == 'Gestación',
-            Madre.fecha_probable_parto <= fecha_limite
+        proximos_partos = self.db.query(PartoProgramado).filter(
+            PartoProgramado.granja_id == granja_id,
+            PartoProgramado.fecha_probable <= fecha_limite,
+            PartoProgramado.realizado == False
         ).count()
 
-        # 2. Fallos reproductivos
+        # 2. Fallos reproductivos (servicios fallidos en los últimos 30 días)
         fecha_limite = datetime.now().date() - timedelta(days=30)
         fallos_reproductivos = self.db.query(GestacionServicio).filter(
             GestacionServicio.granja_id == granja_id,
@@ -185,7 +185,7 @@ class DashboardRepository:
             GestacionServicio.fecha >= fecha_limite
         ).count()
 
-        # 3. Mortalidad
+        # 3. Mortalidad (en los últimos 30 días)
         fecha_limite = datetime.now().date() - timedelta(days=30)
         mortalidad = self.db.query(MaternidadIngreso).filter(
             MaternidadIngreso.granja_id == granja_id,
@@ -205,7 +205,7 @@ class DashboardRepository:
             MedicamentoModel.stock < 10.0
         ).count()
 
-        # 6. Celos recientes
+        # 6. Celos recientes (en los últimos 7 días)
         fecha_limite = datetime.now().date() - timedelta(days=7)
         celos_recientes = self.db.query(GestacionServicio).filter(
             GestacionServicio.granja_id == granja_id,
@@ -220,6 +220,7 @@ class DashboardRepository:
             MaternidadIngreso.estado == 'Activo'
         ).count()
 
+        # Buscar o crear el registro de indicadores
         indicador = self.db.query(DashboardIndicador).filter(
             DashboardIndicador.empresa_id == empresa_id,
             DashboardIndicador.granja_id == granja_id
