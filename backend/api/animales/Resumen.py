@@ -318,3 +318,43 @@ def obtener_resumen_animales(
     total = sum(m.cantidad for m in modulos)
 
     return ResumenAnimales(total=total, modulos=modulos)
+
+    # ========================
+    # 7) Reemplazos
+    # ========================
+    reemplazos_count = (
+        db.query(func.count(Madre.id))
+        .filter(
+            Madre.granja_id == granja_id,
+            Madre.activo.is_(True),
+            Madre.estado_actual == "Reemplazo"
+        )
+        .scalar()
+        or 0
+    )
+    modulos.append(
+        ResumenModulo(modulo="Reemplazos", cantidad=reemplazos_count)
+    )
+
+    # ========================
+    # 8) Fallos reproductivos
+    # ========================
+    # Madres con servicios fallidos que aún están activas
+    madres_fallos_ids = db.query(ServicioGestacion.sow_id).filter(
+        ServicioGestacion.granja_id == granja_id,
+        ServicioGestacion.resultado == "Fallido"
+    ).distinct().subquery()
+
+    fallos_count = (
+        db.query(func.count(Madre.id))
+        .filter(
+            Madre.granja_id == granja_id,
+            Madre.activo.is_(True),
+            Madre.id.in_(madres_fallos_ids)
+        )
+        .scalar()
+        or 0
+    )
+    modulos.append(
+        ResumenModulo(modulo="Fallos reproductivos", cantidad=fallos_count)
+    )
