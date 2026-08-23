@@ -63,10 +63,15 @@ def obtener_resumen_animales(
         # 1.2 Y que NO han tenido parto aún (no están en maternidad)
         
         # Obtener IDs de madres con servicios en gestación activa
-        madres_gestacion_ids = db.query(ServicioGestacion.sow_id).filter(
+        madres_gestacion_ids_query = db.query(ServicioGestacion.sow_id).filter(
             ServicioGestacion.granja_id == granja_id,
             ServicioGestacion.resultado.in_(['Gestación confirmada', 'Pendiente'])
-        ).distinct().subquery()
+        ).distinct()
+        
+        # Imprimir la consulta SQL para depuración
+        print("CONSULTA GESTACIÓN:", str(madres_gestacion_ids_query))
+        
+        madres_gestacion_ids = madres_gestacion_ids_query.subquery()
         
         # Contar madres activas que están en gestación
         gestacion_count = (
