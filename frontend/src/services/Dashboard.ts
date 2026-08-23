@@ -105,8 +105,7 @@ function mapApiToResumen(api: any): ResumenReproductivo {
 export async function getIndicadores(): Promise<IndicadorStats> {
   const empresa_id = getEmpresaId();
 
-  const baseUrl = API_BASE || window.location.origin;
-  const url = new URL(`/dashboard/indicadores`, baseUrl);
+  const url = new URL(`${API_BASE}/dashboard/indicadores`);
   url.searchParams.set("empresa_id", String(empresa_id));
   url.searchParams.set("granja_id", String(GRANJA_ID));
 
@@ -127,8 +126,7 @@ export async function getEventosTareas(
 ): Promise<EventoTarea[]> {
   const empresa_id = getEmpresaId();
 
-  const baseUrl = API_BASE || window.location.origin;
-  const url = new URL(`/dashboard/eventos-tareas`, baseUrl);
+  const url = new URL(`${API_BASE}/dashboard/eventos-tareas`);
   url.searchParams.set("empresa_id", String(empresa_id));
   url.searchParams.set("granja_id", String(GRANJA_ID));
   url.searchParams.set("completado", String(completado));
@@ -148,8 +146,7 @@ export async function getEventosTareas(
 export async function getResumenReproductivo(): Promise<ResumenReproductivo[]> {
   const empresa_id = getEmpresaId();
 
-  const baseUrl = API_BASE || window.location.origin;
-  const url = new URL(`/dashboard/resumen-reproductivo`, baseUrl);
+  const url = new URL(`${API_BASE}/dashboard/resumen-reproductivo`);
   url.searchParams.set("empresa_id", String(empresa_id));
   url.searchParams.set("granja_id", String(GRANJA_ID));
 
@@ -176,8 +173,7 @@ export async function actualizarIndicadores(
     ...payload,
   };
 
-  const baseUrl = API_BASE || window.location.origin;
-  const res = await fetch(`${baseUrl}/dashboard/indicadores`, {
+  const res = await fetch(`${API_BASE}/dashboard/indicadores`, {
     method: "POST",
     headers: getAuthHeaders(),
     body: JSON.stringify(body),
@@ -202,8 +198,7 @@ export async function crearEvento(
     ...payload,
   };
 
-  const baseUrl = API_BASE || window.location.origin;
-  const res = await fetch(`${baseUrl}/dashboard/eventos-tareas`, {
+  const res = await fetch(`${API_BASE}/dashboard/eventos-tareas`, {
     method: "POST",
     headers: getAuthHeaders(),
     body: JSON.stringify(body),
@@ -218,9 +213,8 @@ export async function crearEvento(
 }
 
 export async function marcarEventoCompletado(id: number): Promise<EventoTarea> {
-  const baseUrl = API_BASE || window.location.origin;
   const res = await fetch(
-    `${baseUrl}/dashboard/eventos-tareas/${id}/completar`,
+    `${API_BASE}/dashboard/eventos-tareas/${id}/completar`,
     {
       method: "PUT",
       headers: getAuthHeaders(),
@@ -246,8 +240,7 @@ export async function crearResumenReproductivo(
     ...payload,
   };
 
-  const baseUrl = API_BASE || window.location.origin;
-  const res = await fetch(`${baseUrl}/dashboard/resumen-reproductivo`, {
+  const res = await fetch(`${API_BASE}/dashboard/resumen-reproductivo`, {
     method: "POST",
     headers: getAuthHeaders(),
     body: JSON.stringify(body),
