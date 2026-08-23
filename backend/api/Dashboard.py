@@ -43,11 +43,26 @@ def obtener_indicadores(
     if current_user.empresa_id != empresa_id:
         raise HTTPException(status_code=403, detail="No autorizado")
 
+    # Forzar la creación/actualización de indicadores
     indicadores = repo.obtener_indicadores(empresa_id, granja_id)
+    
+    # Si no hay indicadores, crearlos con valores por defecto
     if not indicadores:
-        raise HTTPException(status_code=404, detail="Indicadores no encontrados")
+        indicadores = repo.crear_actualizar_indicadores(
+            IndicadorCreate(
+                empresa_id=empresa_id,
+                granja_id=granja_id,
+                proximos_partos=0,
+                fallos_reproductivos=0,
+                mortalidad=0,
+                alimento_bajo=0,
+                medicamento_bajo=0,
+                celos_recientes=0,
+                listos_destete=0
+            )
+        )
+    
     return indicadores
-
 
 @router.post(
     "/indicadores",
