@@ -38,8 +38,6 @@ export type ResumenReproductivo = {
   destetes: number;
 };
 
-// Antes: const EMPRESA_ID = 1;
-// Ahora: se toma del localStorage, igual que en Usuarios.
 function getEmpresaId(): number {
   const empresaIdGuardado = localStorage.getItem("empresa_id");
 
@@ -60,8 +58,6 @@ function getEmpresaId(): number {
   return empresa_id;
 }
 
-// Por ahora mantenemos granja fija en 1, como antes.
-// Si luego necesitas manejar múltiples granjas, lo hacemos en un paso aparte.
 const GRANJA_ID = 1;
 
 function mapApiToIndicador(api: any): IndicadorStats {
@@ -109,10 +105,8 @@ function mapApiToResumen(api: any): ResumenReproductivo {
 export async function getIndicadores(): Promise<IndicadorStats> {
   const empresa_id = getEmpresaId();
 
-  const url = new URL(
-    `${API_BASE}/dashboard/indicadores`,
-    window.location.origin
-  );
+  const baseUrl = API_BASE || window.location.origin;
+  const url = new URL(`/dashboard/indicadores`, baseUrl);
   url.searchParams.set("empresa_id", String(empresa_id));
   url.searchParams.set("granja_id", String(GRANJA_ID));
 
@@ -133,10 +127,8 @@ export async function getEventosTareas(
 ): Promise<EventoTarea[]> {
   const empresa_id = getEmpresaId();
 
-  const url = new URL(
-    `${API_BASE}/dashboard/eventos-tareas`,
-    window.location.origin
-  );
+  const baseUrl = API_BASE || window.location.origin;
+  const url = new URL(`/dashboard/eventos-tareas`, baseUrl);
   url.searchParams.set("empresa_id", String(empresa_id));
   url.searchParams.set("granja_id", String(GRANJA_ID));
   url.searchParams.set("completado", String(completado));
@@ -156,10 +148,8 @@ export async function getEventosTareas(
 export async function getResumenReproductivo(): Promise<ResumenReproductivo[]> {
   const empresa_id = getEmpresaId();
 
-  const url = new URL(
-    `${API_BASE}/dashboard/resumen-reproductivo`,
-    window.location.origin
-  );
+  const baseUrl = API_BASE || window.location.origin;
+  const url = new URL(`/dashboard/resumen-reproductivo`, baseUrl);
   url.searchParams.set("empresa_id", String(empresa_id));
   url.searchParams.set("granja_id", String(GRANJA_ID));
 
@@ -186,7 +176,8 @@ export async function actualizarIndicadores(
     ...payload,
   };
 
-  const res = await fetch(`${API_BASE}/dashboard/indicadores`, {
+  const baseUrl = API_BASE || window.location.origin;
+  const res = await fetch(`${baseUrl}/dashboard/indicadores`, {
     method: "POST",
     headers: getAuthHeaders(),
     body: JSON.stringify(body),
@@ -211,7 +202,8 @@ export async function crearEvento(
     ...payload,
   };
 
-  const res = await fetch(`${API_BASE}/dashboard/eventos-tareas`, {
+  const baseUrl = API_BASE || window.location.origin;
+  const res = await fetch(`${baseUrl}/dashboard/eventos-tareas`, {
     method: "POST",
     headers: getAuthHeaders(),
     body: JSON.stringify(body),
@@ -226,8 +218,9 @@ export async function crearEvento(
 }
 
 export async function marcarEventoCompletado(id: number): Promise<EventoTarea> {
+  const baseUrl = API_BASE || window.location.origin;
   const res = await fetch(
-    `${API_BASE}/dashboard/eventos-tareas/${id}/completar`,
+    `${baseUrl}/dashboard/eventos-tareas/${id}/completar`,
     {
       method: "PUT",
       headers: getAuthHeaders(),
@@ -253,7 +246,8 @@ export async function crearResumenReproductivo(
     ...payload,
   };
 
-  const res = await fetch(`${API_BASE}/dashboard/resumen-reproductivo`, {
+  const baseUrl = API_BASE || window.location.origin;
+  const res = await fetch(`${baseUrl}/dashboard/resumen-reproductivo`, {
     method: "POST",
     headers: getAuthHeaders(),
     body: JSON.stringify(body),
