@@ -43,7 +43,7 @@ class DashboardEventoTarea(Base):
     empresa_id = Column(Integer, ForeignKey("empresas.id"), nullable=False)
     granja_id = Column(Integer, ForeignKey("granjas.id"), nullable=False)
 
-    tipo = Column(String(50), nullable=False)  # "destete", "vacunacion", "parto", etc
+    tipo = Column(String(50), nullable=False)
     descripcion = Column(String(255), nullable=False)
     cantidad = Column(Integer, nullable=False)
     fecha_evento = Column(DateTime, nullable=False)
@@ -160,27 +160,22 @@ class DashboardRepository:
     def __init__(self, db: Session):
         self.db = db
 
-    # Indicadores - AHORA CALCULADOS EN TIEMPO REAL
     def obtener_indicadores(
         self, empresa_id: int, granja_id: int
     ) -> Optional[DashboardIndicador]:
-        from backend.models.sows import Sow
+        from backend.models.gestacion.Madres import Madre
         from backend.models.gestacion.Servicios import GestacionServicio
         from backend.models.maternidad.Ingreso import MaternidadIngreso
         from backend.models.insumos.Alimentos import AlimentoModel
         from backend.models.insumos.Medicamentos import MedicamentoModel
 
-        # 1. Próximos partos (hembras en gestación con parto en los próximos 30 días)
         fecha_limite = datetime.now().date() + timedelta(days=30)
-        
-        # Buscar cerdas con estado_actual = 'Gestación' y fecha_probable_parto en los próximos 30 días
-        proximos_partos = self.db.query(Sow).filter(
-            Sow.granja_id == granja_id,
-            Sow.estado_actual == 'Gestación',
-            Sow.fecha_probable_parto <= fecha_limite
+        proximos_partos = self.db.query(Madre).filter(
+            Madre.granja_id == granja_id,
+            Madre.estado_actual == 'Gestación',
+            Madre.fecha_probable_parto <= fecha_limite
         ).count()
 
-        # 2. Fallos reproductivos (servicios fallidos en los últimos 30 días)
         fecha_limite = datetime.now().date() - timedelta(days=30)
         fallos_reproductivos = self.db.query(GestacionServicio).filter(
             GestacionServicio.granja_id == granja_id,
@@ -188,7 +183,6 @@ class DashboardRepository:
             GestacionServicio.fecha >= fecha_limite
         ).count()
 
-        # 3. Mortalidad (en los últimos 30 días)
         fecha_limite = datetime.now().date() - timedelta(days=30)
         mortalidad = self.db.query(MaternidadIngreso).filter(
             MaternidadIngreso.granja_id == granja_id,
@@ -196,20 +190,16 @@ class DashboardRepository:
             MaternidadIngreso.fecha >= fecha_limite
         ).count()
 
-        # 4. Alimentos con stock bajo (< 10% del stock inicial o < 10 unidades)
-        # Asumo que stock es la cantidad actual en la unidad definida
         alimento_bajo = self.db.query(AlimentoModel).filter(
             AlimentoModel.granja_id == granja_id,
             AlimentoModel.stock < 10.0
         ).count()
 
-        # 5. Medicamentos con stock bajo
         medicamento_bajo = self.db.query(MedicamentoModel).filter(
             MedicamentoModel.granja_id == granja_id,
             MedicamentoModel.stock < 10.0
         ).count()
 
-        # 6. Celos recientes (en los últimos 7 días)
         fecha_limite = datetime.now().date() - timedelta(days=7)
         celos_recientes = self.db.query(GestacionServicio).filter(
             GestacionServicio.granja_id == granja_id,
@@ -217,15 +207,12 @@ class DashboardRepository:
             GestacionServicio.fecha >= fecha_limite
         ).count()
 
-        # 7. Listos para destete (lechones con edad >= 21 días)
-        # Asumo que hay un campo 'edad_dias' en MaternidadIngreso
         listos_destete = self.db.query(MaternidadIngreso).filter(
             MaternidadIngreso.granja_id == granja_id,
             MaternidadIngreso.edad_dias >= 21,
             MaternidadIngreso.estado == 'Activo'
         ).count()
 
-        # Buscar o crear el registro de indicadores
         indicador = self.db.query(DashboardIndicador).filter(
             DashboardIndicador.empresa_id == empresa_id,
             DashboardIndicador.granja_id == granja_id
@@ -263,12 +250,8 @@ class DashboardRepository:
     def crear_actualizar_indicadores(
         self, data: IndicadorCreate
     ) -> DashboardIndicador:
-        # Este método se mantiene para compatibilidad, pero los indicadores ahora se calculan
-        # en tiempo real en obtener_indicadores()
-        # Simplemente llamamos a obtener_indicadores y retornamos el resultado
         return self.obtener_indicadores(data.empresa_id, data.granja_id)
 
-    # Eventos y tareas
     def listar_eventos_tareas(
         self, empresa_id: int, granja_id: int, completado: bool = False
     ) -> List[DashboardEventoTarea]:
@@ -309,7 +292,6 @@ class DashboardRepository:
             self.db.refresh(evento)
         return evento
 
-    # Resumen reproductivo
     def listar_resumen_reproductivo(
         self, empresa_id: int, granja_id: int
     ) -> List[DashboardResumenReproductivo]:
