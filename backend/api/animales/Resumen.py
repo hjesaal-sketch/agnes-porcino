@@ -56,14 +56,11 @@ def obtener_resumen_animales(
     # ========================
     # 1) Gestación (madres)
     # ========================
-    # Contar MADRES EN GESTACIÓN según servicios activos
-    # Obtener IDs de madres con servicios en gestación activa
     madres_gestacion_ids = db.query(ServicioGestacion.sow_id).filter(
         ServicioGestacion.granja_id == granja_id,
         ServicioGestacion.resultado.in_(['Gestación confirmada', 'Pendiente'])
     ).distinct().subquery()
 
-    # Contar madres activas que están en gestación
     gestacion_count = (
         db.query(func.count(Madre.id))
         .filter(
@@ -81,7 +78,6 @@ def obtener_resumen_animales(
     # ========================
     # 2) Maternidad
     # ========================
-    # 2.1 Madres en maternidad: ingresos de maternidad de la granja.
     madres_maternidad_count = (
         db.query(func.count(IngresoMaternidad.id))
         .filter(
@@ -92,7 +88,6 @@ def obtener_resumen_animales(
         or 0
     )
 
-    # 2.2 Lechones vivos = nacidos vivos - mortalidad lechones - destetados
     lechones_nacidos_vivos = (
         db.query(
             func.coalesce(func.sum(PartoMaternidad.nacidos_vivos), 0)
@@ -105,7 +100,6 @@ def obtener_resumen_animales(
         or 0
     )
 
-    # Mortalidad maternidad (lechones)
     lechones_muertos = (
         db.query(
             func.coalesce(
@@ -122,7 +116,6 @@ def obtener_resumen_animales(
         or 0
     )
 
-    # Destete: total de lechones destetados
     lechones_destetados = (
         db.query(
             func.coalesce(
@@ -315,10 +308,6 @@ def obtener_resumen_animales(
         ResumenModulo(modulo="Descartes en corral", cantidad=descartes_corral)
     )
 
-    total = sum(m.cantidad for m in modulos)
-
-    return ResumenAnimales(total=total, modulos=modulos)
-
     # ========================
     # 7) Reemplazos
     # ========================
@@ -339,7 +328,6 @@ def obtener_resumen_animales(
     # ========================
     # 8) Fallos reproductivos
     # ========================
-    # Madres con servicios fallidos que aún están activas
     madres_fallos_ids = db.query(ServicioGestacion.sow_id).filter(
         ServicioGestacion.granja_id == granja_id,
         ServicioGestacion.resultado == "Fallido"
@@ -358,3 +346,7 @@ def obtener_resumen_animales(
     modulos.append(
         ResumenModulo(modulo="Fallos reproductivos", cantidad=fallos_count)
     )
+
+    total = sum(m.cantidad for m in modulos)
+
+    return ResumenAnimales(total=total, modulos=modulos)
