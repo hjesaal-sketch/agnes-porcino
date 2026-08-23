@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from sqlalchemy import func
+from sqlalchemy import func, select
 
 from backend.database import get_db
 
@@ -69,7 +69,7 @@ def obtener_resumen_animales(
         .filter(
             Madre.granja_id == granja_id,
             Madre.activo.is_(True),
-            Madre.id.in_(madres_gestacion_ids)
+            Madre.id.in_(select(madres_gestacion_ids.c.sow_id))
         )
         .scalar()
         or 0
