@@ -9,6 +9,7 @@ from backend.database import get_db
 
 # Gestación
 from backend.models.gestacion.Madres import Madre  # tu modelo real de madres gestación
+from backend.models.gestacion.Servicios import ServicioGestacion  # <--- NUEVA LÍNEA
 
 # Maternidad
 from backend.models.maternidad.Ingreso import IngresoMaternidad
